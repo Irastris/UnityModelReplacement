@@ -397,12 +397,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-#Personal
-Uploads
-**/Libraries/*.dll
-
-
-
-
-
-
+# Bundles
+*.bundle

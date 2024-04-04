@@ -21,6 +21,14 @@
     <ReferencePath>$(ReferencePath);$(GamePath)\BepinEx\plugins</ReferencePath>
     <RootNamespace>UnityModelReplacement</RootNamespace>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="suzanne.bundle" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="suzanne.bundle" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />

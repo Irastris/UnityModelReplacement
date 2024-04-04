@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using System.IO;
+using UnityEngine.Assertions;
+using UnityEngine;
+using System.Reflection;
 
 namespace UnityModelReplacement
 {
@@ -53,13 +55,10 @@ namespace UnityModelReplacement
                 }
                 */
 
-                Instance.Logger.LogInfo("Hello, world!");
-                /*
-                if (!__instance.gameObject.TryGetComponent(out BodyReplacementBase existingReplacement))
+                if (!__instance.gameObject.TryGetComponent(out PlayerReplacer existingPlayerReplacer))
                 {
-                    BodyReplacementBase bodyReplacementBase = __instance.gameObject.AddComponent<BodyReplacementBase>();
+                    PlayerReplacer playerReplacer = __instance.gameObject.AddComponent<PlayerReplacer>();
                 }
-                */
 
                 return;
             }
