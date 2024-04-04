@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>ModelReplacementAPI</AssemblyName>
-    <Description>A template for Lethal Company</Description>
+    <AssemblyName>UnityModelReplacement</AssemblyName>
+    <Description>A framework for replacing models in Content Warning</Description>
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <GamePath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\</GamePath>
+    <GamePath>F:\Steam Library\steamapps\common\Content Warning\</GamePath>
   </PropertyGroup>
   
   <PropertyGroup>
@@ -16,11 +16,17 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <ReferencePath>$(ReferencePath);$(GamePath)\Lethal Company_Data\Managed</ReferencePath>
-    <ReferencePath>$(ReferencePath);$(GamePath)\Lethal Company_Data\Plugins</ReferencePath>
+    <ReferencePath>$(ReferencePath);$(GamePath)\Content Warning_Data\Managed</ReferencePath>
+    <ReferencePath>$(ReferencePath);$(GamePath)\Content Warning_Data\Plugins</ReferencePath>
     <ReferencePath>$(ReferencePath);$(GamePath)\BepinEx\plugins</ReferencePath>
-    <RootNamespace>ModelReplacement</RootNamespace>
+    <RootNamespace>UnityModelReplacement</RootNamespace>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Remove="Patches\**" />
+    <EmbeddedResource Remove="Patches\**" />
+    <None Remove="Patches\**" />
+  </ItemGroup>
   
   <ItemGroup>
     <Compile Remove="ModelUpdateHandler.cs" />
@@ -45,23 +51,13 @@
   </ItemGroup>
   
   <ItemGroup>
-    <!--
     <Reference Include="Assembly-CSharp" Publicize="true">
-      <HintPath>$(GamePath)\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(GamePath)\Content Warning_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    -->
-    <Reference Include="Facepunch.Steamworks.Win64" Publicize="true">
-      <HintPath>$(GamePath)\Lethal Company_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Patches\" />
   </ItemGroup>
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(ProjDir)Build&quot; &#xD;&#xA;" />
+      <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(GamePath)BepInEx\plugins\$(ProjectName).dll&quot; &#xD;&#xA;" />
   </Target>
 </Project>
