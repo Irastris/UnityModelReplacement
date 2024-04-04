@@ -14,38 +14,12 @@ namespace UnityModelReplacement
         public GameObject replacementModel;
         public GameObject replacementViewModel;
 
-
         //Misc components
         private MaterialHelper matHelper = null;
 
-        //Mod Support components
-        public bool IsActive = true;
+        protected abstract GameObject LoadAssetsAndReturnModel(); // Loads necessary assets from assetBundle, perform any necessary modifications on the replacement model and return it.
 
-        //Settings
-        public bool UseNoPostProcessing = false;
-        public bool DontConvertUnsupportedShaders = false;
-        public bool GenerateViewModel = false;
-
-        /// <summary>
-        /// Loads necessary assets from assetBundle, perform any necessary modifications on the replacement model and return it.
-        /// </summary>
-        /// <returns>Replacement model GameObject</returns>
-        protected abstract GameObject LoadAssetsAndReturnModel();
-
-        /// <summary>
-        /// Loads necessary assets from assetBundle, perform any necessary modifications on the replacement viewModel and return it. Override if you intend on implementing your own viewmodel. 
-        /// </summary>
-        /// <returns>Replacement viewModel GameObject</returns>
-        protected virtual GameObject LoadAssetsAndReturnViewModel()
-        {
-            return null;
-        }
-
-        /// <summary>
-        /// Override this to return a derivative AvatarUpdater. Only do this if you really know what you are doing. 
-        /// </summary>
-        /// <returns></returns>
-        protected virtual AvatarUpdater GetAvatarUpdater()
+        protected virtual AvatarUpdater GetAvatarUpdater() // Override this to return a derivative AvatarUpdater. Only do this if you really know what you are doing. 
         {
             return new AvatarUpdater();
         }

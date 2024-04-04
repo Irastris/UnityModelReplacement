@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>UnityModelReplacement</AssemblyName>
-    <Description>A framework for replacing models in Content Warning</Description>
+    <Description>Replacing models in Content Warning</Description>
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
@@ -21,20 +21,6 @@
     <ReferencePath>$(ReferencePath);$(GamePath)\BepinEx\plugins</ReferencePath>
     <RootNamespace>UnityModelReplacement</RootNamespace>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <Compile Remove="Patches\**" />
-    <EmbeddedResource Remove="Patches\**" />
-    <None Remove="Patches\**" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Remove="ModelUpdateHandler.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Remove="culling Analysis.txt" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />

@@ -6,12 +6,8 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
 
-namespace ModelReplacement
+namespace UnityModelReplacement
 {
-    //
-    // Assistance and code from Naelstrof from github.com/naelstrof/UnityJigglePhysics/blob/28b090aac3dd7dfcdbd1cd4c04353b4eec012f46/Scripts/JiggleRigHandler.cs
-    // who has been extremely helpful in explaining the unity update loop 
-    //
     public static class ModelUpdateHandler
     {
         private static bool initialized = false;
@@ -37,21 +33,12 @@ namespace ModelReplacement
 
         private static void UpdateModelReplacements()
         {
+            /*
             foreach (var builder in bodyReplacements)
             {
                 builder.CustomUpdate();
             }
-        }
-
-        public static void AddModelReplacement(BodyReplacementBase modelReplacement)
-        {
-            bodyReplacements.Add(modelReplacement);
-            Initialize();
-        }
-
-        public static void RemoveModelReplacement(BodyReplacementBase modelReplacement)
-        {
-            bodyReplacements.Remove(modelReplacement);
+            */
         }
 
         private static PlayerLoopSystem InjectAfter<T,A>(this PlayerLoopSystem self, PlayerLoopSystem systemToInject)
@@ -92,6 +79,7 @@ namespace ModelReplacement
 
             return self;
         }
+
         private static int FindIndexOfSubSubsystem<T>(PlayerLoopSystem[] list, int index = -1)
         {
             if (list == null) return -1;
@@ -104,6 +92,7 @@ namespace ModelReplacement
             }
             return -1;
         }
+
         private static int FindIndexOfSubsystem<T>(PlayerLoopSystem[] list, int index = -1)
         {
             if (list == null) return -1;
@@ -116,6 +105,5 @@ namespace ModelReplacement
             }
             return -1;
         }
-       
     }
 }

@@ -15,7 +15,5 @@ namespace UnityModelReplacement.AvatarBodyUpdater
     {
         public Vector3 rootPositionOffset = new Vector3(0, 0, 0);
         public Vector3 rootScale = new Vector3(1, 1, 1);
-        public bool GenerateViewModel = false;
-        public GameObject ViewModel = null;
     }
 }
