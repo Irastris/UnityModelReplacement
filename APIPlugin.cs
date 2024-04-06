@@ -1,10 +1,8 @@
 ﻿using BepInEx;
-using BepInEx.Logging;
 using HarmonyLib;
 using System.IO;
-using UnityEngine.Assertions;
-using UnityEngine;
 using System.Reflection;
+using UnityEngine;
 
 namespace UnityModelReplacement
 {
@@ -22,39 +20,40 @@ namespace UnityModelReplacement
     public class UnityModelReplacement : BaseUnityPlugin
     {
         public static UnityModelReplacement Instance = null;
-        public new ManualLogSource Logger;
+        public static AssetBundle AssetBundle = null;
 
-        private void Awake()
+        public void LoadAssetBundle()
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(PluginInfo.GUID);
+            MemoryStream memoryStream;
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("UnityModelReplacement.mods.bundle"))
+            {
+                memoryStream = new MemoryStream((int)stream.Length);
+                stream.CopyTo(memoryStream);
+            }
 
+            AssetBundle = AssetBundle.LoadFromMemory(memoryStream.ToArray());
+        }
+
+        public void Awake()
+        {
             if (Instance == null)
             {
                 Instance = this;
             }
 
+            LoadAssetBundle();
+
             Harmony harmony = new Harmony(PluginInfo.GUID);
             harmony.PatchAll();
-
-            Logger.LogInfo($"Plugin {PluginInfo.GUID} is loaded!");
         }
 
         [HarmonyPatch(typeof(PlayerController))]
         public class PlayerControllerPatch
         {
-
             [HarmonyPatch("Update")]
             [HarmonyPostfix]
-            public static void ManageRegistryBodyReplacements(ref PlayerController __instance)
+            public static void AddPlayerReplacerComponent(ref PlayerController __instance)
             {
-                // TODO?: Utilize SteamID for determining who gets what model
-                /*
-                if (player.playerSteamId == 0)
-                {
-                    return;
-                }
-                */
-
                 if (!__instance.gameObject.TryGetComponent(out PlayerReplacer existingPlayerReplacer))
                 {
                     PlayerReplacer playerReplacer = __instance.gameObject.AddComponent<PlayerReplacer>();

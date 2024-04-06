@@ -1,21 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
-using UnityEngine.Pool;
+using UnityEngine.Rendering;
 
 namespace UnityModelReplacement
 {
-    public class AvatarUpdater
+    public class PlayerReplacer : MonoBehaviour
     {
-        protected GameObject player = null;
-        protected GameObject replacement = null;
-        protected Animator replacementAnimator = null;
-        protected SkinnedMeshRenderer playerModelRenderer = null;
+        public SkinnedMeshRenderer playerRenderer = null;
+        public PlayerVisor playerVisor = null;
+        public GameObject replacementModel = null;
+        public Animator replacementAnimator = null;
 
-        protected static Dictionary<string, HumanBodyBones> rigMapping = new Dictionary<string, HumanBodyBones>()
+        public int cachedVisorColor = -1;
+        public int visorColor
+        {
+            get { return cachedVisorColor; }
+            set
+            {
+                if (cachedVisorColor != value)
+                {
+                    cachedVisorColor = value;
+                    LoadModelByVisorColor();
+                }
+            }
+        }
+
+        public static Dictionary<string, HumanBodyBones> rigMapping = new Dictionary<string, HumanBodyBones>()
         {
             {"Hip", HumanBodyBones.Hips},
             {"Torso", HumanBodyBones.Spine},
@@ -58,34 +69,118 @@ namespace UnityModelReplacement
             */
         };
 
-        public void AssignModelReplacement(GameObject player, GameObject replacement)
+        public void DisableBloom()
         {
-            this.player = player;
-            this.replacement = replacement;
-            this.replacementAnimator = replacement.GetComponentInChildren<Animator>();
-            this.playerModelRenderer = player.GetComponentInChildren<SkinnedMeshRenderer>();
-
-            return;
+            GameObject postProcessing = GameObject.Find("GAME/Rendering/Post");
+            if (postProcessing != null)
+            {
+                postProcessing.GetComponent<Volume>().profile.components[2].active = false;
+            }
         }
 
-        private Transform GetAvatarTransformFromBoneName(string boneName)
+        public void ToggleRenderers(bool shouldBeHidden)
+        {
+            foreach (SkinnedMeshRenderer renderer in gameObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                renderer.forceRenderingOff = shouldBeHidden;
+            }
+
+            gameObject.transform.Find("HeadPosition/FACE").GetComponent<MeshRenderer>().forceRenderingOff = shouldBeHidden;
+        }
+
+        public void LoadModel(string assetPath)
+        {
+            if (replacementModel != null)
+            {
+                Destroy(replacementModel);
+            }
+
+            replacementModel = Instantiate(UnityModelReplacement.AssetBundle.LoadAsset<GameObject>(assetPath));
+            replacementAnimator = replacementModel.GetComponentInChildren<Animator>();
+
+            foreach (SkinnedMeshRenderer renderer in replacementModel.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                renderer.updateWhenOffscreen = true;
+
+                // TODO: Hides the local player to avoid the first person camera clipping, a better solution is desired so that the model from the neck down can be retained.
+                if (gameObject.GetComponent<Player>().IsLocal)
+                {
+                    renderer.forceRenderingOff = true;
+                }
+                else
+                {
+                    for (int i = 0; i < renderer.materials.Length; i++)
+                    {
+                        renderer.materials[i].shader = Shader.Find("Universal Render Pipeline/Lit");
+                    }
+                }
+            }
+
+            ToggleRenderers(true);
+        }
+
+        public void LoadModelByVisorColor()
+        {
+            switch (cachedVisorColor)
+            {
+                case 0: // Yellow
+                    LoadModel("Assets/_Modding/ModelA.prefab");
+                    break;
+                case 1: // Orange
+                    LoadModel("Assets/_Modding/ModelB.prefab");
+                    break;
+                case 2: // Red
+                    LoadModel("Assets/_Modding/ModelC.prefab");
+                    break;
+                case 3: // Pink
+                    LoadModel("Assets/_Modding/ModelD.prefab");
+                    break;
+                case 4: // Blue
+                case 5: // Teal
+                case 6: // Green
+                default:
+                    if (replacementModel != null)
+                    {
+                        Destroy(replacementModel);
+                        ToggleRenderers(false);
+                    }
+                    break;
+            }
+        }
+
+        public void Awake()
+        {
+            if (UnityModelReplacement.AssetBundle == null)
+            {
+                Destroy(this);
+            }
+
+            playerRenderer = gameObject.GetComponentInChildren<SkinnedMeshRenderer>();
+            playerVisor = gameObject.GetComponent<PlayerVisor>();
+
+            // TODO: Lazy fix for overly bright URP Lit materials, do something better
+            InvokeRepeating("DisableBloom", 1.0f, 1.0f);
+        }
+
+        public Transform GetAvatarTransformFromBoneName(string boneName)
         {
             return rigMapping.TryGetValue(boneName, out HumanBodyBones avatarBone) ? replacementAnimator.GetBoneTransform(avatarBone) : null;
         }
 
-        private Transform GetPlayerTransformFromBoneName(string boneName)
+        public Transform GetPlayerTransformFromBoneName(string boneName)
         {
-            IEnumerable<Transform> playerBones = playerModelRenderer.bones.Where(x => x.name == boneName);
+            IEnumerable<Transform> playerBones = playerRenderer.bones.Where(x => x.name == boneName);
+
             return playerBones.Any() ? playerBones.First() : null;
         }
 
-        private void UpdateModel()
+        public void CopyPose()
         {
             Transform playerRootBone = GetPlayerTransformFromBoneName("Hip");
             Transform rootBone = GetAvatarTransformFromBoneName("Hip");
             rootBone.position = playerRootBone.position;
 
-            foreach (Transform playerBone in playerModelRenderer.bones)
+            foreach (Transform playerBone in playerRenderer.bones)
             {
                 Transform modelBone = GetAvatarTransformFromBoneName(playerBone.name);
                 if (modelBone == null) { continue; }
@@ -94,83 +189,23 @@ namespace UnityModelReplacement
             }
         }
 
-        public void Update()
+        public void LateUpdate()
         {
-            if (playerModelRenderer == null || replacementAnimator == null)
+            if (playerVisor != null)
             {
-                return;
+                visorColor = playerVisor.visorColorIndex;
             }
 
-            UpdateModel();
-        }
-    }
-
-    public class PlayerReplacer : MonoBehaviour
-    {
-        public AvatarUpdater avatar;
-        public GameObject replacementModel;
-
-        public Material GenerateMaterial()
-        {
-            Shader niceShader = Shader.Find("NiceShader");
-            Debug.Log(niceShader);
-            Material replacementMat = new Material(niceShader);
-            replacementMat.color = UnityEngine.Random.ColorHSV();
-            return replacementMat;
-        }
-
-        private GameObject LoadModelFromAssetBundle(string assetPath)
-        {
-            MemoryStream memoryStream;
-            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("UnityModelReplacement.suzanne.bundle"))
+            if (playerRenderer != null && replacementAnimator != null)
             {
-                memoryStream = new MemoryStream((int)stream.Length);
-                stream.CopyTo(memoryStream);
-            }
-
-            AssetBundle modBundle = AssetBundle.LoadFromMemory(memoryStream.ToArray());
-
-            return modBundle.LoadAsset<GameObject>(assetPath);
-        }
-
-        private GameObject LoadModelReplacement(string assetPath)
-        {
-            GameObject replacementModel = LoadModelFromAssetBundle(assetPath);
-            replacementModel = Instantiate(replacementModel);
-
-            SkinnedMeshRenderer[] skinnedRenderers = replacementModel.GetComponentsInChildren<SkinnedMeshRenderer>();
-            foreach (SkinnedMeshRenderer renderer in skinnedRenderers)
-            {
-                renderer.updateWhenOffscreen = true;
-
-                List<Material> materials = ListPool<Material>.Get();
-                renderer.GetSharedMaterials(materials);
-                for (int i = 0; i < materials.Count; i++)
-                {
-                    materials[i] = GenerateMaterial();
-                }
-                renderer.SetMaterials(materials);
-            }
-
-            return replacementModel;
-        }
-
-        protected virtual void Awake()
-        {
-            replacementModel = LoadModelReplacement("Assets/_Modding/Temp.prefab");
-            avatar = new AvatarUpdater();
-            avatar.AssignModelReplacement(gameObject, replacementModel);
-
-            SkinnedMeshRenderer[] skinnedRenderers = gameObject.GetComponentsInChildren<SkinnedMeshRenderer>();
-            foreach (SkinnedMeshRenderer renderer in skinnedRenderers)
-            {
-                renderer.forceRenderingOff = true;
+                CopyPose();
             }
         }
 
-        public virtual void LateUpdate()
+        public void OnDestroy()
         {
-            avatar.Update();
+            CancelInvoke();
+            Destroy(replacementModel);
         }
     }
 }
