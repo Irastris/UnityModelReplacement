@@ -10,6 +10,8 @@ namespace UnityModelReplacement
         public SkinnedMeshRenderer playerRenderer = null;
         public PlayerVisor playerVisor = null;
         public GameObject replacementModel = null;
+        public GameObject replacementHead = null;
+        public GameObject replacementHeadShadow = null;
         public Animator replacementAnimator = null;
 
         public int cachedVisorColor = -1;
@@ -96,24 +98,27 @@ namespace UnityModelReplacement
             }
 
             replacementModel = Instantiate(UnityModelReplacement.AssetBundle.LoadAsset<GameObject>(assetPath));
+            replacementHead = replacementModel.transform.Find("Head").gameObject;
+            replacementHeadShadow = replacementModel.transform.Find("ShadowHead").gameObject;
             replacementAnimator = replacementModel.GetComponentInChildren<Animator>();
 
             foreach (SkinnedMeshRenderer renderer in replacementModel.GetComponentsInChildren<SkinnedMeshRenderer>())
             {
                 renderer.updateWhenOffscreen = true;
 
-                // TODO: Hides the local player to avoid the first person camera clipping, a better solution is desired so that the model from the neck down can be retained.
-                if (gameObject.GetComponent<Player>().IsLocal)
+                for (int i = 0; i < renderer.materials.Length; i++)
                 {
-                    renderer.forceRenderingOff = true;
+                    renderer.materials[i].shader = Shader.Find("Universal Render Pipeline/Lit");
                 }
-                else
-                {
-                    for (int i = 0; i < renderer.materials.Length; i++)
-                    {
-                        renderer.materials[i].shader = Shader.Find("Universal Render Pipeline/Lit");
-                    }
-                }
+            }
+
+            if (gameObject.GetComponent<Player>().IsLocal)
+            {
+                replacementHead.layer = LayerMask.NameToLayer("LocalDontSee");
+            }
+            else
+            {
+                replacementHeadShadow.SetActive(false); // No need to double up on shadow casting for non-local player replacements
             }
 
             ToggleRenderers(true);
