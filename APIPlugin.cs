@@ -62,5 +62,23 @@ namespace UnityModelReplacement
                 return;
             }
         }
+
+        // TODO: Another lazy fix for overly bright URP Lit materials, do something better
+        [HarmonyPatch(typeof(FlashLightTrigger))]
+        public class FlashLightTriggerPatch
+        {
+            [HarmonyPatch("Start")]
+            [HarmonyPostfix]
+            public static void LowerLightIntensity(ref FlashLightTrigger __instance)
+            { 
+                Transform componentOwner = __instance.transform.parent;
+                if (componentOwner.name.Equals("FlipLight"))
+                {
+                    bool isOnSurface = __instance.gameObject.scene.name.Equals("SurfaceScene");
+                    Light flipLight = componentOwner.GetComponent<Light>();
+                    flipLight.intensity = isOnSurface ? 0f : (flipLight.intensity / 100f);
+                }
+            }
+        }
     }
 }

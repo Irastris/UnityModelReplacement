@@ -164,7 +164,7 @@ namespace UnityModelReplacement
             playerVisor = gameObject.GetComponent<PlayerVisor>();
 
             // TODO: Lazy fix for overly bright URP Lit materials, do something better
-            InvokeRepeating("DisableBloom", 1.0f, 1.0f);
+            InvokeRepeating("DisableBloom", 0f, 1.0f);
         }
 
         public Transform GetAvatarTransformFromBoneName(string boneName)
