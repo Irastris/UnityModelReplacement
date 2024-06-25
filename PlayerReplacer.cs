@@ -82,7 +82,7 @@ namespace UnityModelReplacement
 
         public void ToggleRenderers(bool shouldBeHidden)
         {
-            foreach (SkinnedMeshRenderer renderer in gameObject.GetComponentsInChildren<SkinnedMeshRenderer>())
+            foreach (SkinnedMeshRenderer renderer in gameObject.transform.Find("CharacterModel").GetComponentsInChildren<SkinnedMeshRenderer>())
             {
                 renderer.forceRenderingOff = shouldBeHidden;
             }
@@ -160,7 +160,7 @@ namespace UnityModelReplacement
                 Destroy(this);
             }
 
-            playerRenderer = gameObject.GetComponentInChildren<SkinnedMeshRenderer>();
+            playerRenderer = gameObject.transform.Find("CharacterModel/BodyRenderer").GetComponent<SkinnedMeshRenderer>();
             playerVisor = gameObject.GetComponent<PlayerVisor>();
 
             // TODO: Lazy fix for overly bright URP Lit materials, do something better
