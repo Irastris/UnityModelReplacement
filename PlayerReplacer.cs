@@ -1,85 +1,65 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace UnityModelReplacement
 {
     public class PlayerReplacer : MonoBehaviour
     {
-        public SkinnedMeshRenderer playerRenderer = null;
-        public PlayerVisor playerVisor = null;
         public GameObject replacementModel = null;
-        public GameObject replacementHead = null;
-        public GameObject replacementHeadShadow = null;
         public Animator replacementAnimator = null;
 
-        public int cachedVisorColor = -1;
-        public int visorColor
-        {
-            get { return cachedVisorColor; }
-            set
-            {
-                if (cachedVisorColor != value)
-                {
-                    cachedVisorColor = value;
-                    LoadModelByVisorColor();
-                }
-            }
-        }
+        public EnemyParent enemyParent = null;
+        public SkinnedMeshRenderer enemyRenderer = null;
 
         public static Dictionary<string, HumanBodyBones> rigMapping = new Dictionary<string, HumanBodyBones>()
         {
-            {"Hip", HumanBodyBones.Hips},
-            {"Torso", HumanBodyBones.Spine},
-            {"Arm_L", HumanBodyBones.LeftUpperArm},
-            {"Elbow_L", HumanBodyBones.LeftLowerArm},
-            {"Hand_L", HumanBodyBones.LeftHand},
-            {"Arm_R", HumanBodyBones.RightUpperArm},
-            {"Elbow_R", HumanBodyBones.RightLowerArm},
-            {"Hand_R", HumanBodyBones.RightHand},
-            {"Head", HumanBodyBones.Head},
-            {"Leg_L", HumanBodyBones.LeftUpperLeg},
-            {"Knee_L", HumanBodyBones.LeftLowerLeg},
-            {"Foot_L", HumanBodyBones.LeftFoot},
-            {"Leg_R", HumanBodyBones.RightUpperLeg},
-            {"Knee_R", HumanBodyBones.RightLowerLeg},
-            {"Foot_R", HumanBodyBones.RightFoot},
-
-            // TODO: Content Warning's rig does not distinguish between the left and right finger bones making mapping difficult. Solve for this.
-            /*
-            {"", HumanBodyBones.LeftLittleProximal},
-            {"", HumanBodyBones.LeftLittleIntermediate},
-            {"", HumanBodyBones.LeftRingProximal},
-            {"", HumanBodyBones.LeftRingIntermediate},
-            {"", HumanBodyBones.LeftMiddleProximal},
-            {"", HumanBodyBones.LeftMiddleIntermediate},
-            {"", HumanBodyBones.LeftIndexProximal},
-            {"", HumanBodyBones.LeftIndexIntermediate},
-            {"", HumanBodyBones.LeftThumbProximal},
-            {"", HumanBodyBones.LeftThumbDistal},
-            {"", HumanBodyBones.RightLittleProximal},
-            {"", HumanBodyBones.RightLittleIntermediate},
-            {"", HumanBodyBones.RightRingProximal},
-            {"", HumanBodyBones.RightRingIntermediate},
-            {"", HumanBodyBones.RightMiddleProximal},
-            {"", HumanBodyBones.RightMiddleIntermediate},
-            {"", HumanBodyBones.RightIndexProximal},
-            {"", HumanBodyBones.RightIndexIntermediate},
-            {"", HumanBodyBones.RightThumbProximal},
-            {"", HumanBodyBones.RightThumbDistal},
-            */
+            {"HIPS", HumanBodyBones.Hips},
+            {"MIDRIF", HumanBodyBones.Spine},
+            {"CHEST", HumanBodyBones.Chest},
+            {"LEFT_SHOULDER", HumanBodyBones.LeftShoulder},
+            {"LEFT_ARM", HumanBodyBones.LeftUpperArm},
+            {"LEFT_ELBOW", HumanBodyBones.LeftLowerArm},
+            {"LEFT_HAND", HumanBodyBones.LeftHand},
+            {"LEFT_PINK", HumanBodyBones.LeftLittleProximal},
+            {"LEFT_PINK2", HumanBodyBones.LeftLittleIntermediate},
+            // {"LEFT_PINK3", HumanBodyBones.LeftLittleDistal},
+            {"LEFT_MIDDLE", HumanBodyBones.LeftMiddleProximal},
+            {"LEFT_MIDDLE2", HumanBodyBones.LeftMiddleIntermediate},
+            // {"LEFT_MIDDLE3", HumanBodyBones.LeftMiddleDistal},
+            {"LEFT_INDEX", HumanBodyBones.LeftIndexProximal},
+            {"LEFT_INDEX2", HumanBodyBones.LeftIndexIntermediate},
+            // {"LEFT_INDEX3", HumanBodyBones.LeftIndexDistal},
+            {"LEFT_THUMB", HumanBodyBones.LeftThumbProximal},
+            {"LEFT_THUMB2", HumanBodyBones.LeftThumbIntermediate},
+            // {"LEFT_THUMB3", HumanBodyBones.LeftThumbDistal},
+            {"RIGHT_SHOULDER", HumanBodyBones.RightShoulder},
+            {"RIGHT_ARM", HumanBodyBones.RightUpperArm},
+            {"RIGHT_ELBOW", HumanBodyBones.RightLowerArm},
+            {"RIGHT_HAND", HumanBodyBones.RightHand},
+            {"RIGHT_PINK", HumanBodyBones.RightLittleProximal},
+            {"RIGHT_PINK2", HumanBodyBones.RightLittleIntermediate},
+            // {"RIGHT_PINK3", HumanBodyBones.RightLittleDistal},
+            {"RIGHT_MIDDLE", HumanBodyBones.RightMiddleProximal},
+            {"RIGHT_MIDDLE2", HumanBodyBones.RightMiddleIntermediate},
+            // {"RIGHT_MIDDLE3", HumanBodyBones.RightMiddleDistal},
+            {"RIGHT_INDEX", HumanBodyBones.RightIndexProximal},
+            {"RIGHT_INDEX2", HumanBodyBones.RightIndexIntermediate},
+            // {"RIGHT_INDEX3", HumanBodyBones.RightIndexDistal},
+            {"RIGHT_THUMB", HumanBodyBones.RightThumbProximal},
+            {"RIGHT_THUMB2", HumanBodyBones.RightThumbIntermediate},
+            // {"RIGHT_THUMB3", HumanBodyBones.RightThumbDistal},
+            {"NECK", HumanBodyBones.Neck},
+            {"HEAD", HumanBodyBones.Head},
+            {"LEFT_LEG", HumanBodyBones.LeftUpperLeg},
+            {"LEFT_KNEE", HumanBodyBones.LeftLowerLeg},
+            {"LEFT_ANKLE", HumanBodyBones.LeftFoot},
+            {"RIGHT_LEG", HumanBodyBones.RightUpperLeg},
+            {"RIGHT_KNEE", HumanBodyBones.RightLowerLeg},
+            {"RIGHT_ANKLE", HumanBodyBones.RightFoot},
         };
 
-        public void DisableBloom()
-        {
-            GameObject postProcessing = GameObject.Find("GAME/Rendering/Post");
-            if (postProcessing != null)
-            {
-                postProcessing.GetComponent<Volume>().profile.components[2].active = false;
-            }
-        }
-
+        /*
         public void ToggleRenderers(bool shouldBeHidden)
         {
             foreach (SkinnedMeshRenderer renderer in gameObject.transform.Find("CharacterModel").GetComponentsInChildren<SkinnedMeshRenderer>())
@@ -89,6 +69,7 @@ namespace UnityModelReplacement
 
             gameObject.transform.Find("HeadPosition/FACE").GetComponent<MeshRenderer>().forceRenderingOff = shouldBeHidden;
         }
+        */
 
         public void LoadModel(string assetPath)
         {
@@ -98,10 +79,9 @@ namespace UnityModelReplacement
             }
 
             replacementModel = Instantiate(UnityModelReplacement.AssetBundle.LoadAsset<GameObject>(assetPath));
-            replacementHead = replacementModel.transform.Find("Head").gameObject;
-            replacementHeadShadow = replacementModel.transform.Find("ShadowHead").gameObject;
             replacementAnimator = replacementModel.GetComponentInChildren<Animator>();
 
+            /*
             foreach (SkinnedMeshRenderer renderer in replacementModel.GetComponentsInChildren<SkinnedMeshRenderer>())
             {
                 renderer.updateWhenOffscreen = true;
@@ -111,43 +91,23 @@ namespace UnityModelReplacement
                     renderer.materials[i].shader = Shader.Find("Universal Render Pipeline/Lit");
                 }
             }
+            */
 
-            if (gameObject.GetComponent<Player>().IsLocal)
-            {
-                replacementHead.layer = LayerMask.NameToLayer("LocalDontSee");
-            }
-            else
-            {
-                replacementHeadShadow.SetActive(false); // No need to double up on shadow casting for non-local player replacements
-            }
-
-            ToggleRenderers(true);
+            enemyRenderer.forceRenderingOff = true; // ToggleRenderers(true);
         }
 
-        public void LoadModelByVisorColor()
+        public void LoadModelByEnemyName(string enemyName)
         {
-            switch (cachedVisorColor)
+            switch (enemyName)
             {
-                case 0: // Yellow
-                    LoadModel("Assets/_Modding/ModelA.prefab");
+                case "Norman_Model":
+                    LoadModel("Assets/CustomContent/Irastris/NormanTest.prefab");
                     break;
-                case 1: // Orange
-                    LoadModel("Assets/_Modding/ModelB.prefab");
-                    break;
-                case 2: // Red
-                    LoadModel("Assets/_Modding/ModelC.prefab");
-                    break;
-                case 3: // Pink
-                    LoadModel("Assets/_Modding/ModelD.prefab");
-                    break;
-                case 4: // Blue
-                case 5: // Teal
-                case 6: // Green
                 default:
                     if (replacementModel != null)
                     {
                         Destroy(replacementModel);
-                        ToggleRenderers(false);
+                        enemyRenderer.forceRenderingOff = false; // ToggleRenderers(false);
                     }
                     break;
             }
@@ -160,11 +120,9 @@ namespace UnityModelReplacement
                 Destroy(this);
             }
 
-            playerRenderer = gameObject.transform.Find("CharacterModel/BodyRenderer").GetComponent<SkinnedMeshRenderer>();
-            playerVisor = gameObject.GetComponent<PlayerVisor>();
-
-            // TODO: Lazy fix for overly bright URP Lit materials, do something better
-            InvokeRepeating("DisableBloom", 0f, 1.0f);
+            enemyParent = gameObject.GetComponent<EnemyParent>();
+            enemyRenderer = enemyParent.myRenderer;
+            LoadModelByEnemyName(enemyRenderer.name);
         }
 
         public Transform GetAvatarTransformFromBoneName(string boneName)
@@ -174,18 +132,18 @@ namespace UnityModelReplacement
 
         public Transform GetPlayerTransformFromBoneName(string boneName)
         {
-            IEnumerable<Transform> playerBones = playerRenderer.bones.Where(x => x.name == boneName);
+            IEnumerable<Transform> playerBones = enemyRenderer.bones.Where(x => x.name == boneName);
 
             return playerBones.Any() ? playerBones.First() : null;
         }
 
         public void CopyPose()
         {
-            Transform playerRootBone = GetPlayerTransformFromBoneName("Hip");
-            Transform rootBone = GetAvatarTransformFromBoneName("Hip");
+            Transform playerRootBone = GetPlayerTransformFromBoneName("HIPS");
+            Transform rootBone = GetAvatarTransformFromBoneName("HIPS");
             rootBone.position = playerRootBone.position;
 
-            foreach (Transform playerBone in playerRenderer.bones)
+            foreach (Transform playerBone in enemyRenderer.bones)
             {
                 Transform modelBone = GetAvatarTransformFromBoneName(playerBone.name);
                 if (modelBone == null) { continue; }
@@ -196,12 +154,7 @@ namespace UnityModelReplacement
 
         public void LateUpdate()
         {
-            if (playerVisor != null)
-            {
-                visorColor = playerVisor.visorColorIndex;
-            }
-
-            if (playerRenderer != null && replacementAnimator != null)
+            if (enemyRenderer != null && replacementAnimator != null)
             {
                 CopyPose();
             }
