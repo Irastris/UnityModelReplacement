@@ -6,15 +6,7 @@ using UnityEngine;
 
 namespace UnityModelReplacement
 {
-    public static class PluginInfo
-    {
-        public const string GUID = "irastris.UnityModelReplacement";
-        public const string NAME = "UnityModelReplacement";
-        public const string VERSION = "1.0.0";
-        public const string WEBSITE = "https://github.com/Irastris/UnityModelReplacement";
-    }
-
-    [BepInPlugin(PluginInfo.GUID, PluginInfo.NAME, PluginInfo.VERSION)]
+    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     [BepInProcess("My Friendly Neighborhood.exe")]
 
     public class UnityModelReplacement : BaseUnityPlugin
@@ -43,23 +35,82 @@ namespace UnityModelReplacement
 
             LoadAssetBundle();
 
-            Harmony harmony = new Harmony(PluginInfo.GUID);
+            Harmony harmony = new Harmony(PluginInfo.PLUGIN_GUID);
             harmony.PatchAll();
         }
 
-        /*
-        [HarmonyPatch(typeof(PlayerController))]
-        public class PlayerControllerPatch
+        [HarmonyPatch(typeof(EnemyParent))]
+        public class EnemyParentPatch
         {
-            [HarmonyPatch("Update")]
+            [HarmonyPatch("Awake")] // Update
             [HarmonyPostfix]
-            public static void AddPlayerReplacerComponent(ref PlayerController __instance)
+            public static void AddEnemyReplacerComponent(ref EnemyParent __instance)
             {
-                if (!__instance.gameObject.TryGetComponent(out PlayerReplacer existingPlayerReplacer))
+                if (!__instance.gameObject.TryGetComponent(out EnemyReplacer existingEnemyReplacer))
                 {
-                    PlayerReplacer playerReplacer = __instance.gameObject.AddComponent<PlayerReplacer>();
+                    __instance.gameObject.AddComponent<EnemyReplacer>();
                 }
 
+                return;
+            }
+        }
+
+        [HarmonyPatch(typeof(PearlAnimationController))]
+        public class PearlAnimationControllerPatch
+        {
+            [HarmonyPatch("Awake")] // LateUpdate
+            [HarmonyPostfix]
+            public static void AddPearlReplacerComponent(ref PearlAnimationController __instance)
+            {
+                if (!__instance.gameObject.TryGetComponent(out PearlReplacer existingPearlReplacer))
+                {
+                    __instance.gameObject.AddComponent<PearlReplacer>();
+                }
+
+                return;
+            }
+        }
+
+        [HarmonyPatch(typeof(GobbleInWorld))]
+        public class GobbleInWorldPatch
+        {
+            [HarmonyPatch("Awake")] // LateUpdate
+            [HarmonyPostfix]
+            public static void AddGobbleReplacerComponent(ref GobbleInWorld __instance)
+            {
+                if (!__instance.gameObject.TryGetComponent(out GobbleReplacer existingGobbleReplacer))
+                {
+                    __instance.gameObject.AddComponent<GobbleReplacer>();
+                }
+
+                return;
+            }
+        }
+
+        [HarmonyPatch(typeof(SadGobletteController))]
+        public class SadGoblettePatch
+        {
+            [HarmonyPatch("Awake")] // LateUpdate
+            [HarmonyPostfix]
+            public static void AddGobbleReplacerComponent(ref SadGobletteController __instance)
+            {
+                if (!__instance.gameObject.TryGetComponent(out GobbleReplacer existingGobbleReplacer))
+                {
+                    __instance.gameObject.AddComponent<GobbleReplacer>();
+                }
+
+                return;
+            }
+        }
+
+        /*
+        [HarmonyPatch(typeof(Player))]
+        public class PlayerPatches
+        {
+            [HarmonyPatch("Awake")]
+            [HarmonyPostfix]
+            public static void HealthPatch(ref Player __instance)
+            {
                 return;
             }
         }
