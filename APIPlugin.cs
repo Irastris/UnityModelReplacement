@@ -7,7 +7,7 @@ using UnityEngine;
 namespace UnityModelReplacement
 {
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-    [BepInProcess("My Friendly Neighborhood.exe")]
+    [BepInProcess("Zort.exe")]
 
     public class UnityModelReplacement : BaseUnityPlugin
     {
@@ -39,81 +39,50 @@ namespace UnityModelReplacement
             harmony.PatchAll();
         }
 
-        [HarmonyPatch(typeof(EnemyParent))]
-        public class EnemyParentPatch
+        [HarmonyPatch(typeof(PlayerController))]
+        public class PlayerControllerPatch
         {
-            [HarmonyPatch("Awake")] // Update
+            [HarmonyPatch("Update")] // Awake
             [HarmonyPostfix]
-            public static void AddEnemyReplacerComponent(ref EnemyParent __instance)
+            public static void AddPlayerReplacerComponent(ref PlayerController __instance)
             {
-                if (!__instance.gameObject.TryGetComponent(out EnemyReplacer existingEnemyReplacer))
+                if (!__instance.gameObject.TryGetComponent(out PlayerReplacer existingPlayerReplacer))
                 {
-                    __instance.gameObject.AddComponent<EnemyReplacer>();
+                    __instance.gameObject.AddComponent<PlayerReplacer>();
                 }
-
-                return;
             }
         }
 
-        [HarmonyPatch(typeof(PearlAnimationController))]
-        public class PearlAnimationControllerPatch
+        [HarmonyPatch(typeof(CinematicHandler))]
+        public class CinematicHandlerPatch
         {
-            [HarmonyPatch("Awake")] // LateUpdate
+            [HarmonyPatch("PlayCinematicFunction")]
             [HarmonyPostfix]
-            public static void AddPearlReplacerComponent(ref PearlAnimationController __instance)
+            public static void AddCinematicReplacerComponent(ref CinematicHandler __instance)
             {
-                if (!__instance.gameObject.TryGetComponent(out PearlReplacer existingPearlReplacer))
+                if (!__instance.gameObject.TryGetComponent(out CinematicReplacer existingCinematicReplacer))
                 {
-                    __instance.gameObject.AddComponent<PearlReplacer>();
+                    __instance.gameObject.AddComponent<CinematicReplacer>();
                 }
-
-                return;
+                else
+                {
+                    existingCinematicReplacer.Awake();
+                }
             }
         }
 
-        [HarmonyPatch(typeof(GobbleInWorld))]
-        public class GobbleInWorldPatch
-        {
-            [HarmonyPatch("Awake")] // LateUpdate
-            [HarmonyPostfix]
-            public static void AddGobbleReplacerComponent(ref GobbleInWorld __instance)
-            {
-                if (!__instance.gameObject.TryGetComponent(out GobbleReplacer existingGobbleReplacer))
-                {
-                    __instance.gameObject.AddComponent<GobbleReplacer>();
-                }
-
-                return;
-            }
-        }
-
-        [HarmonyPatch(typeof(SadGobletteController))]
-        public class SadGoblettePatch
-        {
-            [HarmonyPatch("Awake")] // LateUpdate
-            [HarmonyPostfix]
-            public static void AddGobbleReplacerComponent(ref SadGobletteController __instance)
-            {
-                if (!__instance.gameObject.TryGetComponent(out GobbleReplacer existingGobbleReplacer))
-                {
-                    __instance.gameObject.AddComponent<GobbleReplacer>();
-                }
-
-                return;
-            }
-        }
-
-        /*
-        [HarmonyPatch(typeof(Player))]
-        public class PlayerPatches
+        [HarmonyPatch(typeof(FriendlySkinwalker))]
+        public class FriendlySkinwalkerPatch
         {
             [HarmonyPatch("Awake")]
             [HarmonyPostfix]
-            public static void HealthPatch(ref Player __instance)
+            public static void AddSkinwalkerReplacerComponent(ref FriendlySkinwalker __instance)
             {
-                return;
+                if (!__instance.gameObject.TryGetComponent(out SkinwalkerReplacer existingSkinwalkerReplacer))
+                {
+                    __instance.gameObject.AddComponent<SkinwalkerReplacer>();
+                }
             }
         }
-        */
     }
 }

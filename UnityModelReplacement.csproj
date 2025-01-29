@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
@@ -10,14 +10,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\..\..\..\Unity Projects\My Friendly Neighborhood\Assets\AssetBundles\mods.bundle" Link="mods.bundle" />
+    <EmbeddedResource Include="..\..\Unity Projects\Zort\Assets\AssetBundles\mods.bundle" Link="mods.bundle" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
     <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
-    <PackageReference Include="UnityEngine.Modules" Version="2020.1.17" IncludeAssets="compile" />
+    <PackageReference Include="UnityEngine.Modules" Version="2023.2.20" IncludeAssets="compile" />
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
@@ -26,11 +26,17 @@
   
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\Steam Library\steamapps\common\My Friendly Neighborhood\My Friendly Neighborhood_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\Steam Library\steamapps\common\Zort\Zort_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mirror">
+      <HintPath>..\..\Steam Library\steamapps\common\Zort\Zort_Data\Managed\Mirror.dll</HintPath>
+    </Reference>
+    <Reference Include="netstandard">
+      <HintPath>..\..\Steam Library\steamapps\common\Zort\Zort_Data\Managed\netstandard.dll</HintPath>
     </Reference>
   </ItemGroup>
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;F:\Steam Library\steamapps\common\My Friendly Neighborhood\BepInEx\plugins\$(ProjectName).dll&quot;" />
+    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;F:\Steam Library\steamapps\common\Zort\BepInEx\plugins\$(ProjectName).dll&quot;" />
   </Target>
 </Project>
