@@ -7,7 +7,7 @@ using UnityEngine;
 namespace UnityModelReplacement
 {
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-    [BepInProcess("Zort.exe")]
+    [BepInProcess("REPO.exe")]
 
     public class UnityModelReplacement : BaseUnityPlugin
     {
@@ -39,48 +39,17 @@ namespace UnityModelReplacement
             harmony.PatchAll();
         }
 
-        [HarmonyPatch(typeof(PlayerController))]
-        public class PlayerControllerPatch
+        [HarmonyPatch(typeof(PlayerAvatar))]
+        public class PlayerAvatarPatch
         {
-            [HarmonyPatch("Update")] // Awake
+            [HarmonyPatch("LateStart")]
             [HarmonyPostfix]
-            public static void AddPlayerReplacerComponent(ref PlayerController __instance)
+            public static void AddPlayerReplacerComponent(ref PlayerAvatar __instance)
             {
                 if (!__instance.gameObject.TryGetComponent(out PlayerReplacer existingPlayerReplacer))
                 {
                     __instance.gameObject.AddComponent<PlayerReplacer>();
-                }
-            }
-        }
-
-        [HarmonyPatch(typeof(CinematicHandler))]
-        public class CinematicHandlerPatch
-        {
-            [HarmonyPatch("PlayCinematicFunction")]
-            [HarmonyPostfix]
-            public static void AddCinematicReplacerComponent(ref CinematicHandler __instance)
-            {
-                if (!__instance.gameObject.TryGetComponent(out CinematicReplacer existingCinematicReplacer))
-                {
-                    __instance.gameObject.AddComponent<CinematicReplacer>();
-                }
-                else
-                {
-                    existingCinematicReplacer.Awake();
-                }
-            }
-        }
-
-        [HarmonyPatch(typeof(FriendlySkinwalker))]
-        public class FriendlySkinwalkerPatch
-        {
-            [HarmonyPatch("Awake")]
-            [HarmonyPostfix]
-            public static void AddSkinwalkerReplacerComponent(ref FriendlySkinwalker __instance)
-            {
-                if (!__instance.gameObject.TryGetComponent(out SkinwalkerReplacer existingSkinwalkerReplacer))
-                {
-                    __instance.gameObject.AddComponent<SkinwalkerReplacer>();
+                    __instance.gameObject.GetComponent<PlayerReplacer>().playerName = Traverse.Create(__instance).Field("playerName").GetValue<string>();
                 }
             }
         }

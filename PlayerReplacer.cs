@@ -1,14 +1,10 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace UnityModelReplacement
 {
     public class PlayerReplacer : MonoBehaviour
     {
-        public SkinnedMeshRenderer playerRenderer = null;
-
         public GameObject replacementPrefab = null;
-        public SkinnedMeshRenderer replacementRenderer = null;
 
         public string cachedPlayerName = "";
         public string playerName
@@ -23,7 +19,6 @@ namespace UnityModelReplacement
                 }
             }
         }
-
         public void LoadModel(string assetPath)
         {
             if (replacementPrefab != null)
@@ -33,38 +28,85 @@ namespace UnityModelReplacement
 
             replacementPrefab = Instantiate(UnityModelReplacement.AssetBundle.LoadAsset<GameObject>(assetPath));
             replacementPrefab.SetActive(false);
-            SceneManager.MoveGameObjectToScene(replacementPrefab, SceneManager.GetSceneByName("Players"));
-            replacementRenderer = replacementPrefab.transform.Find("Model").GetComponent<SkinnedMeshRenderer>();
 
-            playerRenderer.sharedMesh = replacementRenderer.sharedMesh;
-            playerRenderer.material.SetTexture("_BaseColorMap", replacementRenderer.material.GetTexture("_BaseColorMap"));
-            playerRenderer.material.DisableKeyword("_NORMALMAP");
-            playerRenderer.material.DisableKeyword("_MASKMAP");
-
-            foreach (MeshRenderer renderer in gameObject.transform.Find("insanityPlayerModel/PlayerModel/ZortRagdollPlayer/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head").GetComponentsInChildren<MeshRenderer>())
+            Transform playerHeadLower = this.transform.parent.Find("Player Visuals/[RIG]/code_lean/code_tilt/ANIM BOT/_____________________________________/ANIM BODY BOT/_____________________________________/ANIM BODY TOP/code_body_top_up/code_body_top_side").GetChild(3).Find("ANIM HEAD BOT/code_head_bot_up/code_head_bot_side/mesh_head_bot_sphere");
+            Transform replacementHeadLower = replacementPrefab.transform.Find("mesh_head_bot_sphere");
+            playerHeadLower.GetComponent<MeshFilter>().mesh = replacementHeadLower.GetComponent<MeshFilter>().mesh;
+            playerHeadLower.GetComponent<MeshRenderer>().materials = replacementHeadLower.GetComponent<MeshRenderer>().materials;
+            foreach (Material material in playerHeadLower.GetComponent<MeshRenderer>().materials)
             {
-                renderer.forceRenderingOff = true;
+                material.shader = Shader.Find("Hurtable/Hurtable");
             }
+
+            Transform playerHeadUpper = this.transform.parent.Find("Player Visuals/[RIG]/code_lean/code_tilt/ANIM BOT/_____________________________________/ANIM BODY BOT/_____________________________________/ANIM BODY TOP/code_body_top_up/code_body_top_side").GetChild(3).Find("ANIM HEAD BOT/code_head_bot_up/code_head_bot_side/_____________________________________/ANIM HEAD TOP/code_head_top/mesh_head_top");
+            if (!assetPath.Contains("Kenny"))
+            {
+                Transform replacementHeadUpper = replacementPrefab.transform.Find("mesh_head_top");
+                playerHeadUpper.GetComponent<MeshFilter>().mesh = replacementHeadUpper.GetComponent<MeshFilter>().mesh;
+                playerHeadUpper.GetComponent<MeshRenderer>().materials = replacementHeadUpper.GetComponent<MeshRenderer>().materials;
+                foreach (Material material in playerHeadUpper.GetComponent<MeshRenderer>().materials)
+                {
+                    material.shader = Shader.Find("Hurtable/Hurtable");
+                }
+            }
+            else
+            {
+                playerHeadUpper.GetComponent<MeshRenderer>().forceRenderingOff = true;
+            }
+            
+            // BEGIN WALL OF LAZY BULLSHIT
+
+            MeshRenderer playerCrown = this.transform.parent.Find("Player Visuals/[RIG]/code_lean/code_tilt/ANIM BOT/_____________________________________/ANIM BODY BOT/_____________________________________/ANIM BODY TOP/code_body_top_up/code_body_top_side").GetChild(3).Find("ANIM HEAD BOT/code_head_bot_up/code_head_bot_side/_____________________________________/ANIM HEAD TOP/code_head_top/ArenaCrown").GetComponent<MeshRenderer>();
+            playerCrown.forceRenderingOff = true;
+
+            MeshRenderer playerEyeLeft = this.transform.parent.Find("Player Visuals/[RIG]/code_lean/code_tilt/ANIM BOT/_____________________________________/ANIM BODY BOT/_____________________________________/ANIM BODY TOP/code_body_top_up/code_body_top_side").GetChild(3).Find("ANIM HEAD BOT/code_head_bot_up/code_head_bot_side/_____________________________________/ANIM HEAD TOP/code_head_top").GetChild(4).Find("ANIM EYE LEFT/code_eye_left/mesh_eye_l").GetComponent<MeshRenderer>();
+            playerEyeLeft.forceRenderingOff = true;
+
+            MeshRenderer playerPupilLeft = this.transform.parent.Find("Player Visuals/[RIG]/code_lean/code_tilt/ANIM BOT/_____________________________________/ANIM BODY BOT/_____________________________________/ANIM BODY TOP/code_body_top_up/code_body_top_side").GetChild(3).Find("ANIM HEAD BOT/code_head_bot_up/code_head_bot_side/_____________________________________/ANIM HEAD TOP/code_head_top").GetChild(4).Find("ANIM EYE LEFT/code_eye_left/ANIM PUPIL LEFT/mesh_pupil_l").GetComponent<MeshRenderer>();
+            playerPupilLeft.forceRenderingOff = true;
+
+            MeshRenderer playerEyeRight = this.transform.parent.Find("Player Visuals/[RIG]/code_lean/code_tilt/ANIM BOT/_____________________________________/ANIM BODY BOT/_____________________________________/ANIM BODY TOP/code_body_top_up/code_body_top_side").GetChild(3).Find("ANIM HEAD BOT/code_head_bot_up/code_head_bot_side/_____________________________________/ANIM HEAD TOP/code_head_top").GetChild(5).Find("ANIM EYE RIGHT/code_eye_right/mesh_eye_r").GetComponent<MeshRenderer>();
+            playerEyeRight.forceRenderingOff = true;
+
+            MeshRenderer playerPupilRight = this.transform.parent.Find("Player Visuals/[RIG]/code_lean/code_tilt/ANIM BOT/_____________________________________/ANIM BODY BOT/_____________________________________/ANIM BODY TOP/code_body_top_up/code_body_top_side").GetChild(3).Find("ANIM HEAD BOT/code_head_bot_up/code_head_bot_side/_____________________________________/ANIM HEAD TOP/code_head_top").GetChild(5).Find("ANIM EYE RIGHT/code_eye_right/ANIM PUPIL RIGHT/mesh_pupil_r").GetComponent<MeshRenderer>();
+            playerPupilRight.forceRenderingOff = true;
+
+            MeshRenderer playerHealth = this.transform.parent.Find("Player Visuals/[RIG]/code_lean/code_tilt/ANIM BOT/_____________________________________/ANIM BODY BOT/_____________________________________/ANIM BODY TOP/code_body_top_up/code_body_top_side").GetChild(3).Find("ANIM HEAD BOT/code_head_bot_up/code_head_bot_side/Health Hide/mesh_health").GetComponent<MeshRenderer>();
+            playerHealth.forceRenderingOff = true;
+
+            MeshRenderer playerHealthFrame = this.transform.parent.Find("Player Visuals/[RIG]/code_lean/code_tilt/ANIM BOT/_____________________________________/ANIM BODY BOT/_____________________________________/ANIM BODY TOP/code_body_top_up/code_body_top_side").GetChild(3).Find("ANIM HEAD BOT/code_head_bot_up/code_head_bot_side/Health Hide/mesh_health/mesh_health frame").GetComponent<MeshRenderer>();
+            playerHealthFrame.forceRenderingOff = true;
+
+            MeshRenderer playerHealthShadow = this.transform.parent.Find("Player Visuals/[RIG]/code_lean/code_tilt/ANIM BOT/_____________________________________/ANIM BODY BOT/_____________________________________/ANIM BODY TOP/code_body_top_up/code_body_top_side").GetChild(3).Find("ANIM HEAD BOT/code_head_bot_up/code_head_bot_side/Health Hide/mesh_health/mesh_health shadow").GetComponent<MeshRenderer>();
+            playerHealthShadow.forceRenderingOff = true;
         }
 
         public void LoadModelByPlayerName()
         {
             switch (playerName)
             {
-                case "Daphne": case "Daphne Blake":
-                    LoadModel("Assets/_Modding/Daphne.prefab");
+                case "Eric":
+                    LoadModel("Assets/_Modding/Eric.prefab");
                     break;
-                case "Fred": case "Fred Jones":
-                    LoadModel("Assets/_Modding/Fred.prefab");
+                case "Kenny":
+                case "Irastris":
+                    LoadModel("Assets/_Modding/Kenny.prefab");
                     break;
-                case "Scooby": case "Scooby Doo":
-                    LoadModel("Assets/_Modding/Scooby.prefab");
+                case "Kyle":
+                    LoadModel("Assets/_Modding/Kyle.prefab");
                     break;
-                case "Shaggy": case "Shaggy Rogers":
-                    LoadModel("Assets/_Modding/Shaggy.prefab");
+                case "Mackey":
+                case "kboykboy":
+                    LoadModel("Assets/_Modding/Mackey.prefab");
                     break;
-                case "Velma": case "Velma Dinkley":
-                    LoadModel("Assets/_Modding/Velma.prefab");
+                case "Phillip":
+                    LoadModel("Assets/_Modding/Phillip.prefab");
+                    break;
+                case "Stan":
+                    LoadModel("Assets/_Modding/Stan.prefab");
+                    break;
+                case "Terrance":
+                    LoadModel("Assets/_Modding/Terrance.prefab");
                     break;
                 default:
                     if (replacementPrefab != null)
@@ -81,9 +123,6 @@ namespace UnityModelReplacement
             {
                 Destroy(this);
             }
-
-            playerRenderer = gameObject.transform.Find("insanityPlayerModel/PlayerModel/ZortRagdollPlayer/Zort_Character_Low").GetComponent<SkinnedMeshRenderer>();
-            playerName = gameObject.GetComponent<PlayerController>().PlayerData.username;
         }
 
         public void OnDestroy()
