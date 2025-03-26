@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\..\..\..\Unity Projects\My Friendly Neighborhood\Assets\AssetBundles\mods.bundle" Link="mods.bundle" />
+    <EmbeddedResource Include="..\..\..\..\..\Unity Projects\SchoolBoy Runaway\Assets\AssetBundles\mods.bundle" Link="mods.bundle" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,11 +26,11 @@
   
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\Steam Library\steamapps\common\My Friendly Neighborhood\My Friendly Neighborhood_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\Steam Library\steamapps\common\SchoolBoy Runaway\SchoolBoy Runaway_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;F:\Steam Library\steamapps\common\My Friendly Neighborhood\BepInEx\plugins\$(ProjectName).dll&quot;" />
+    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;F:\Steam Library\steamapps\common\SchoolBoy Runaway\BepInEx\plugins\$(ProjectName).dll&quot;" />
   </Target>
 </Project>

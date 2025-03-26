@@ -7,7 +7,7 @@ using UnityEngine;
 namespace UnityModelReplacement
 {
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-    [BepInProcess("My Friendly Neighborhood.exe")]
+    [BepInProcess("SchoolBoy Runaway.exe")]
 
     public class UnityModelReplacement : BaseUnityPlugin
     {
@@ -39,81 +39,123 @@ namespace UnityModelReplacement
             harmony.PatchAll();
         }
 
-        [HarmonyPatch(typeof(EnemyParent))]
-        public class EnemyParentPatch
-        {
-            [HarmonyPatch("Awake")] // Update
-            [HarmonyPostfix]
-            public static void AddEnemyReplacerComponent(ref EnemyParent __instance)
-            {
-                if (!__instance.gameObject.TryGetComponent(out EnemyReplacer existingEnemyReplacer))
-                {
-                    __instance.gameObject.AddComponent<EnemyReplacer>();
-                }
-
-                return;
-            }
-        }
-
-        [HarmonyPatch(typeof(PearlAnimationController))]
-        public class PearlAnimationControllerPatch
-        {
-            [HarmonyPatch("Awake")] // LateUpdate
-            [HarmonyPostfix]
-            public static void AddPearlReplacerComponent(ref PearlAnimationController __instance)
-            {
-                if (!__instance.gameObject.TryGetComponent(out PearlReplacer existingPearlReplacer))
-                {
-                    __instance.gameObject.AddComponent<PearlReplacer>();
-                }
-
-                return;
-            }
-        }
-
-        [HarmonyPatch(typeof(GobbleInWorld))]
-        public class GobbleInWorldPatch
-        {
-            [HarmonyPatch("Awake")] // LateUpdate
-            [HarmonyPostfix]
-            public static void AddGobbleReplacerComponent(ref GobbleInWorld __instance)
-            {
-                if (!__instance.gameObject.TryGetComponent(out GobbleReplacer existingGobbleReplacer))
-                {
-                    __instance.gameObject.AddComponent<GobbleReplacer>();
-                }
-
-                return;
-            }
-        }
-
-        [HarmonyPatch(typeof(SadGobletteController))]
-        public class SadGoblettePatch
-        {
-            [HarmonyPatch("Awake")] // LateUpdate
-            [HarmonyPostfix]
-            public static void AddGobbleReplacerComponent(ref SadGobletteController __instance)
-            {
-                if (!__instance.gameObject.TryGetComponent(out GobbleReplacer existingGobbleReplacer))
-                {
-                    __instance.gameObject.AddComponent<GobbleReplacer>();
-                }
-
-                return;
-            }
-        }
-
-        /*
-        [HarmonyPatch(typeof(Player))]
-        public class PlayerPatches
+        [HarmonyPatch(typeof(AI.Andrew.Andrew))]
+        public class AndrewPatch
         {
             [HarmonyPatch("Awake")]
             [HarmonyPostfix]
-            public static void HealthPatch(ref Player __instance)
+            public static void AddCharacterReplacerComponent(ref AI.Andrew.Andrew __instance)
             {
+                // Self
+                if (!__instance.gameObject.TryGetComponent(out CharacterReplacer existingCharacterReplacer))
+                {
+                    __instance.gameObject.AddComponent<CharacterReplacer>();
+                }
+
+                // Cutscenes
+                foreach (string characterPath in new string[] { "Pre Story cut-scene/AndrewGRP", "Pre Story cut-scene/MomGRP", "Pre Story cut-scene/Igor Cut Scene", "Belt Ending/Dad Cutscene" })
+                {
+                    Transform character = GameObject.Find("_Parent_Timelines").transform.Find(characterPath);
+                    if (character)
+                    {
+                        if (!character.gameObject.TryGetComponent(out CharacterReplacer existingCharacterReplacer2))
+                        {
+                            character.gameObject.AddComponent<CharacterReplacer>();
+                            Debug.Log($"CharacterReplacer component added to {character.name}");
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log($"Character {characterPath} not found!");
+                    }
+                }
+
                 return;
             }
         }
-        */
+
+        [HarmonyPatch(typeof(AI.Mom.Mom))]
+        public class MomPatch
+        {
+            [HarmonyPatch("Awake")]
+            [HarmonyPostfix]
+            public static void AddCharacterReplacerComponent(ref AI.Mom.Mom __instance)
+            {
+                if (!__instance.gameObject.TryGetComponent(out CharacterReplacer existingCharacterReplacer))
+                {
+                    __instance.gameObject.AddComponent<CharacterReplacer>();
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(AI.Igor.Igor))]
+        public class IgorPatch
+        {
+            [HarmonyPatch("Awake")]
+            [HarmonyPostfix]
+            public static void AddCharacterReplacerComponent(ref AI.Igor.Igor __instance)
+            {
+                if (!__instance.gameObject.TryGetComponent(out CharacterReplacer existingCharacterReplacer))
+                {
+                    __instance.gameObject.AddComponent<CharacterReplacer>();
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(AI.Vika.Vika))]
+        public class VikaPatch
+        {
+            [HarmonyPatch("Awake")]
+            [HarmonyPostfix]
+            public static void AddCharacterReplacerComponent(ref AI.Vika.Vika __instance)
+            {
+                if (!__instance.gameObject.TryGetComponent(out CharacterReplacer existingCharacterReplacer))
+                {
+                    __instance.gameObject.AddComponent<CharacterReplacer>();
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(AI.Dad.Dad))]
+        public class DadPatch
+        {
+            [HarmonyPatch("Awake")]
+            [HarmonyPostfix]
+            public static void AddCharacterReplacerComponent(ref AI.Dad.Dad __instance)
+            {
+                if (!__instance.gameObject.TryGetComponent(out CharacterReplacer existingCharacterReplacer))
+                {
+                    __instance.gameObject.AddComponent<CharacterReplacer>();
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(AI.Dog.Dog))]
+        public class DogPatch
+        {
+            [HarmonyPatch("Awake")]
+            [HarmonyPostfix]
+            public static void AddCharacterReplacerComponent(ref AI.Dog.Dog __instance)
+            {
+                if (!__instance.gameObject.TryGetComponent(out CharacterReplacer existingCharacterReplacer))
+                {
+                    __instance.gameObject.AddComponent<CharacterReplacer>();
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(AI.Fishman.Fishman))]
+        public class FishermanPatch
+        {
+            [HarmonyPatch("Awake")]
+            [HarmonyPostfix]
+            public static void AddCharacterReplacerComponent(ref AI.Fishman.Fishman __instance)
+            {
+                if (!__instance.gameObject.TryGetComponent(out CharacterReplacer existingCharacterReplacer))
+                {
+                    __instance.gameObject.AddComponent<CharacterReplacer>();
+                }
+            }
+        }
     }
 }
