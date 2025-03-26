@@ -85,28 +85,24 @@ namespace UnityModelReplacement
         {
             switch (playerName)
             {
-                case "Eric":
-                    LoadModel("Assets/_Modding/Eric.prefab");
-                    break;
-                case "Kenny":
+                case "Beaker":
                 case "Irastris":
-                    LoadModel("Assets/_Modding/Kenny.prefab");
+                    LoadModel("Assets/_Modding/Beaker.prefab");
                     break;
-                case "Kyle":
-                    LoadModel("Assets/_Modding/Kyle.prefab");
+                case "Gonzo":
+                    LoadModel("Assets/_Modding/Gonzo.prefab");
                     break;
-                case "Mackey":
+                case "Kermit":
                 case "kboykboy":
-                    LoadModel("Assets/_Modding/Mackey.prefab");
+                    LoadModel("Assets/_Modding/Kermit.prefab");
                     break;
-                case "Phillip":
-                    LoadModel("Assets/_Modding/Phillip.prefab");
+                case "Miss Piggy":
+                case "Piggy":
+                    LoadModel("Assets/_Modding/MissPiggy.prefab");
                     break;
-                case "Stan":
-                    LoadModel("Assets/_Modding/Stan.prefab");
-                    break;
-                case "Terrance":
-                    LoadModel("Assets/_Modding/Terrance.prefab");
+                case "Swedish Chef":
+                case "Chef":
+                    LoadModel("Assets/_Modding/SwedishChef.prefab");
                     break;
                 default:
                     if (replacementPrefab != null)
