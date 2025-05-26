@@ -19,7 +19,7 @@ namespace UnityModelReplacement
 
         public void LoadModel(string assetPath)
         {
-            replacementModel = Instantiate(UnityModelReplacement.AssetBundle.LoadAsset<GameObject>(assetPath));
+            replacementModel = Instantiate(UnityModelReplacement.ModBundle.LoadAsset<GameObject>(assetPath));
             replacementRenderer = replacementModel.transform.Find("Model").GetComponent<SkinnedMeshRenderer>();
 
             foreach (SkinnedMeshRenderer renderer in replacementModel.GetComponentsInChildren<SkinnedMeshRenderer>())
@@ -66,7 +66,7 @@ namespace UnityModelReplacement
 
         public void Awake()
         {
-            if (UnityModelReplacement.AssetBundle == null)
+            if (UnityModelReplacement.ModBundle == null)
             {
                 Destroy(this);
             }
@@ -81,54 +81,55 @@ namespace UnityModelReplacement
                         characterRenderer = this.transform.Find("Andrew").GetComponent<SkinnedMeshRenderer>();
                         if (!characterRenderer) Destroy(this);
                         hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, -0.316049f, 0f);
-                        LoadModel("Assets/_Modding/Bart.prefab");
+                        hipsOffset = new Vector3(0f, -0.003045f, 0f);
+                        LoadModel("Assets/_Modding/Villager.prefab");
                         break;
                     case "AndrewGRP":
                         characterRenderer = this.transform.Find("Andrew1").GetComponent<SkinnedMeshRenderer>();
                         if (!characterRenderer) Destroy(this);
                         hipsBoneName = "Hips";
-                        hipsOffset = new Vector3(0f, -0.316049f, 0f);
-                        LoadModel("Assets/_Modding/BartCutscene.prefab");
+                        hipsOffset = new Vector3(0f, -0.003045f, 0f);
+                        LoadModel("Assets/_Modding/VillagerCutscene.prefab");
                         break;
                     case "Mom":
                     case "MomGRP":
                         characterRenderer = this.transform.Find("Mom").GetComponent<SkinnedMeshRenderer>();
                         if (!characterRenderer) Destroy(this);
                         hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, 0.046601f, 0f);
-                        LoadModel("Assets/_Modding/Marge.prefab");
+                        hipsOffset = new Vector3(0f, -0.2f, 0f);
+                        LoadModel("Assets/_Modding/Alex.prefab");
                         break;
                     case "Igor":
                     case "Igor Cut Scene":
                         characterRenderer = this.transform.Find("Igor").GetComponent<SkinnedMeshRenderer>();
                         if (!characterRenderer) Destroy(this);
                         hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, -0.200735f, 0f);
-                        LoadModel("Assets/_Modding/Milhouse.prefab");
+                        hipsOffset = new Vector3(0f, -0.003045f, 0f);
+                        LoadModel("Assets/_Modding/Villager.prefab");
                         break;
                     case "Vika":
                         characterRenderer = this.transform.Find("Vika").GetComponent<SkinnedMeshRenderer>();
                         if (!characterRenderer) Destroy(this);
                         hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, -0.354493f, 0f);
-                        LoadModel("Assets/_Modding/Ralph.prefab");
+                        hipsOffset = new Vector3(0f, -0.003045f, 0f);
+                        LoadModel("Assets/_Modding/Villager.prefab");
                         break;
                     case "Dad":
                     case "Dad Cutscene":
                         characterRenderer = this.transform.Find("Dad").GetComponent<SkinnedMeshRenderer>();
                         if (!characterRenderer) Destroy(this);
                         hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, -0.227519f, 0f);
-                        LoadModel("Assets/_Modding/Homer.prefab");
+                        hipsOffset = new Vector3(0f, -0.3f, 0f);
+                        LoadModel("Assets/_Modding/Steve.prefab");
                         break;
                     case "Dog":
                         characterRenderer = this.transform.Find("Dog_Lod1").GetComponent<SkinnedMeshRenderer>();
                         if (!characterRenderer) Destroy(this);
                         hipsBoneName = "Root_M";
-                        hipsOffset = new Vector3(0f, -0.068869f, 0f);
-                        LoadModel("Assets/_Modding/SLH.prefab");
+                        hipsOffset = new Vector3(0f, -0.022811f, 0f);
+                        LoadModel("Assets/_Modding/Wolf.prefab");
                         break;
+                    /*
                     case "Fishman":
                         characterRenderer = this.transform.Find("FishMan").GetComponent<SkinnedMeshRenderer>();
                         if (!characterRenderer) Destroy(this);
@@ -136,6 +137,7 @@ namespace UnityModelReplacement
                         hipsOffset = new Vector3(0f, -0.237751f, 0f);
                         LoadModel("Assets/_Modding/Captain.prefab");
                         break;
+                    */
                     default:
                         Debug.Log($"No character renderer or replacement model found for {character.name}!");
                         Destroy(this);
