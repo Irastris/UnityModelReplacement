@@ -26,7 +26,7 @@
   
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\Steam Library\steamapps\common\My Friendly Neighborhood\My Friendly Neighborhood_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\Steam Library\steamapps\common\My Friendly Neighborhood\My Friendly Neighborhood_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   

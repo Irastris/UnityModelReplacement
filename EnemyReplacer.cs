@@ -36,6 +36,10 @@ namespace UnityModelReplacement
             {
                 enemyRenderer.transform.parent.Find("ROOT/BELLY/MIDRIF/CHEST/NECK/HEAD/JAW/TOP_LIP/George_Hat").GetComponent<MeshRenderer>().forceRenderingOff = true;
             }
+            else if (enemyRenderer.name == "Lilian_Body")
+            {
+                enemyRenderer.transform.parent.Find("ROOT/BELLY/MIDRIF/CHEST/NECK/HEAD/JAW/Lilian_Hat1/Mesh").GetComponent<MeshRenderer>().forceRenderingOff = true;
+            }
         }
 
         public void LoadModelByEnemyName(string enemyName)
@@ -54,6 +58,9 @@ namespace UnityModelReplacement
                     break;
                 case "George_Body":
                     LoadModel("Assets/CustomContent/Irastris/Elmo.prefab");
+                    break;
+                case "Lilian_Body":
+                    LoadModel("Assets/CustomContent/Irastris/Beaker.prefab");
                     break;
                 default:
                     Debug.Log($"No replacement model found for renderer {enemyName}!");
@@ -110,8 +117,24 @@ namespace UnityModelReplacement
         {
             if (enemyRenderer != null && replacementRenderer != null)
             {
-                replacementModel.SetActive(gameObject.activeSelf);
+                // replacementModel.SetActive(gameObject.activeSelf);
                 CopyPose();
+            }
+        }
+
+        public void OnEnable()
+        {
+            if (replacementModel != null)
+            {
+                replacementModel.SetActive(true);
+            }
+        }
+
+        public void OnDisable()
+        {
+            if (replacementModel != null)
+            {
+                replacementModel.SetActive(false);
             }
         }
 

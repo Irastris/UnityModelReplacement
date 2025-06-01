@@ -38,7 +38,7 @@ namespace UnityModelReplacement
         public void Awake()
         {
             Debug.Log(gameObject.name);
-            Debug.Log(gameObject.active);
+            // Debug.Log(gameObject.active);
 
             if (UnityModelReplacement.AssetBundle == null)
             {

@@ -1,8 +1,10 @@
 ﻿using BepInEx;
 using HarmonyLib;
+using System;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Playables;
 
 namespace UnityModelReplacement
 {
@@ -115,5 +117,19 @@ namespace UnityModelReplacement
             }
         }
         */
+
+        [HarmonyPatch(typeof(PlayableDirector), nameof(PlayableDirector.Play), new Type[] { })]
+        public class PlayableDirectorPatch
+        {
+            [HarmonyPostfix]
+            public static void AddCutsceneReplacerComponent(ref PlayableDirector __instance)
+            {
+                if (!__instance.gameObject.TryGetComponent(out CutsceneReplacer existingCutsceneReplacer))
+                {
+                    __instance.gameObject.AddComponent<CutsceneReplacer>();
+                }
+                return;
+            }
+        }
     }
 }
