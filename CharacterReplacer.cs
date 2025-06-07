@@ -1,209 +1,212 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
-namespace UnityModelReplacement
+namespace UnityModelReplacement;
+
+public class CharacterReplacer : MonoBehaviour
 {
-    public class CharacterReplacer : MonoBehaviour
+    public SkinnedMeshRenderer characterRenderer;
+
+    public GameObject replacementModel;
+    public SkinnedMeshRenderer replacementRendererBody;
+    public SkinnedMeshRenderer replacementRendererHead;
+    public List<Transform> rendererRootTransforms = new List<Transform>() { };
+
+    public Transform targetRoot;
+    public Transform sourceRoot;
+    public string rootName = "DEF_Spine";
+    public Vector3 rootOffset = new Vector3();
+
+    public void LoadModelWithoutSeparateHead(string assetPath)
     {
-        public GameObject character;
-        public SkinnedMeshRenderer characterRenderer;
+        replacementModel = Instantiate(Plugin.ModBundle.LoadAsset<GameObject>(assetPath));
+        replacementModel.transform.localScale = Vector3.one * 1.3f;
+        replacementRendererBody = replacementModel.transform.Find("Model").GetComponent<SkinnedMeshRenderer>();
+        replacementRendererBody.gameObject.layer = characterRenderer.gameObject.layer;
+        replacementRendererBody.updateWhenOffscreen = true;
 
-        public GameObject replacementModel;
-        public SkinnedMeshRenderer replacementRenderer;
-
-        public Transform targetRoot;
-        public Transform sourceRoot;
-        public string hipsBoneName;
-        public Vector3 hipsOffset = new Vector3();
-
-        public void LoadModel(string assetPath)
+        if (rendererRootTransforms.Any())
         {
-            replacementModel = Instantiate(UnityModelReplacement.ModBundle.LoadAsset<GameObject>(assetPath));
-            replacementRenderer = replacementModel.transform.Find("Model").GetComponent<SkinnedMeshRenderer>();
-
-            foreach (SkinnedMeshRenderer renderer in replacementModel.GetComponentsInChildren<SkinnedMeshRenderer>())
+            foreach (Transform transform in rendererRootTransforms)
             {
-                renderer.updateWhenOffscreen = true;
-            }
-
-            if (characterRenderer.name == "Dad")
-            {
-                characterRenderer.forceRenderingOff = true;
-            }
-            else
-            {
-                characterRenderer.sharedMesh = null;
-            }
-
-            if (characterRenderer.name == "Andrew")
-            {
-                characterRenderer.transform.Find("Head").GetComponent<SkinnedMeshRenderer>().sharedMesh = null;
-                characterRenderer.transform.parent.Find("mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/Backpack").GetComponent<MeshFilter>().sharedMesh = null;
-            }
-
-            if (characterRenderer.name == "Andrew1")
-            {
-                characterRenderer.transform.parent.Find("Head").GetComponent<SkinnedMeshRenderer>().sharedMesh = null;
-            }
-
-            if (character.name == "Mom" || characterRenderer.name == "Igor" || characterRenderer.name == "Vika")
-            {
-                characterRenderer.transform.GetChild(0).GetComponent<SkinnedMeshRenderer>().sharedMesh = null;
-                characterRenderer.transform.GetChild(1).GetComponent<SkinnedMeshRenderer>().sharedMesh = null;
-            }
-            else if (characterRenderer.name == "Dad")
-            {
-                characterRenderer.transform.GetChild(0).GetComponent<SkinnedMeshRenderer>().forceRenderingOff = true;
-                characterRenderer.transform.GetChild(1).GetComponent<SkinnedMeshRenderer>().forceRenderingOff = true;
-            }
-            else if (characterRenderer.name == "Dog_Lod1")
-            {
-                characterRenderer.transform.parent.Find("Dog_Lod2").GetComponent<SkinnedMeshRenderer>().sharedMesh = null;
-                characterRenderer.transform.parent.Find("Dog_Lod3").GetComponent<SkinnedMeshRenderer>().sharedMesh = null;
-            }
-        }
-
-        public void Awake()
-        {
-            if (UnityModelReplacement.ModBundle == null)
-            {
-                Destroy(this);
-            }
-
-            character = this.gameObject;
-
-            if (character != null)
-            {
-                switch (character.name)
+                foreach (Renderer renderer in transform.GetComponentsInChildren<Renderer>(true))
                 {
-                    case "Andrew":
-                        characterRenderer = this.transform.Find("Andrew").GetComponent<SkinnedMeshRenderer>();
-                        if (!characterRenderer) Destroy(this);
-                        hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, -0.003045f, 0f);
-                        LoadModel("Assets/_Modding/Villager.prefab");
-                        break;
-                    case "AndrewGRP":
-                        characterRenderer = this.transform.Find("Andrew1").GetComponent<SkinnedMeshRenderer>();
-                        if (!characterRenderer) Destroy(this);
-                        hipsBoneName = "Hips";
-                        hipsOffset = new Vector3(0f, -0.003045f, 0f);
-                        LoadModel("Assets/_Modding/VillagerCutscene.prefab");
-                        break;
-                    case "Mom":
-                    case "MomGRP":
-                        characterRenderer = this.transform.Find("Mom").GetComponent<SkinnedMeshRenderer>();
-                        if (!characterRenderer) Destroy(this);
-                        hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, -0.2f, 0f);
-                        LoadModel("Assets/_Modding/Alex.prefab");
-                        break;
-                    case "Igor":
-                    case "Igor Cut Scene":
-                        characterRenderer = this.transform.Find("Igor").GetComponent<SkinnedMeshRenderer>();
-                        if (!characterRenderer) Destroy(this);
-                        hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, -0.003045f, 0f);
-                        LoadModel("Assets/_Modding/Villager.prefab");
-                        break;
-                    case "Vika":
-                        characterRenderer = this.transform.Find("Vika").GetComponent<SkinnedMeshRenderer>();
-                        if (!characterRenderer) Destroy(this);
-                        hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, -0.003045f, 0f);
-                        LoadModel("Assets/_Modding/Villager.prefab");
-                        break;
-                    case "Dad":
-                    case "Dad Cutscene":
-                        characterRenderer = this.transform.Find("Dad").GetComponent<SkinnedMeshRenderer>();
-                        if (!characterRenderer) Destroy(this);
-                        hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, -0.3f, 0f);
-                        LoadModel("Assets/_Modding/Steve.prefab");
-                        break;
-                    case "Dog":
-                        characterRenderer = this.transform.Find("Dog_Lod1").GetComponent<SkinnedMeshRenderer>();
-                        if (!characterRenderer) Destroy(this);
-                        hipsBoneName = "Root_M";
-                        hipsOffset = new Vector3(0f, -0.022811f, 0f);
-                        LoadModel("Assets/_Modding/Wolf.prefab");
-                        break;
-                    /*
-                    case "Fishman":
-                        characterRenderer = this.transform.Find("FishMan").GetComponent<SkinnedMeshRenderer>();
-                        if (!characterRenderer) Destroy(this);
-                        hipsBoneName = "mixamorig:Hips";
-                        hipsOffset = new Vector3(0f, -0.237751f, 0f);
-                        LoadModel("Assets/_Modding/Captain.prefab");
-                        break;
-                    */
-                    default:
-                        Debug.Log($"No character renderer or replacement model found for {character.name}!");
-                        Destroy(this);
-                        break;
+                    renderer.forceRenderingOff = true;
                 }
             }
-            else
+        }
+
+        Material mat = new Material(Shader.Find("Shader Graphs/Puppet_Base"));
+        if (replacementRendererBody.material != null)
+        {
+            mat.SetTexture("_Puppet_Colors", replacementRendererBody.material.GetTexture("_Puppet_Colors"));
+            mat.SetTexture("_Normal", replacementRendererBody.material.GetTexture("_Normal"));
+        }
+        replacementRendererBody.material = mat;
+    }
+
+    public void LoadModel(string assetPath)
+    {
+        replacementModel = Instantiate(Plugin.ModBundle.LoadAsset<GameObject>(assetPath));
+        replacementModel.transform.localScale = Vector3.one * 1.3f;
+        replacementRendererBody = replacementModel.transform.Find("Model").GetComponent<SkinnedMeshRenderer>();
+        replacementRendererHead = replacementModel.transform.Find("Model_Head").GetComponent<SkinnedMeshRenderer>();
+        replacementRendererBody.gameObject.layer = characterRenderer.gameObject.layer;
+        replacementRendererHead.gameObject.layer = characterRenderer.gameObject.layer;
+        replacementRendererBody.updateWhenOffscreen = true;
+        replacementRendererHead.updateWhenOffscreen = true;
+
+        if (rendererRootTransforms.Any())
+        {
+            foreach (Transform transform in rendererRootTransforms)
             {
-                Debug.Log("No character found!");
+                foreach (Renderer renderer in transform.GetComponentsInChildren<Renderer>(true))
+                {
+                    renderer.forceRenderingOff = true;
+                }
+            }
+        }
+
+        Material mat = new Material(Shader.Find("Shader Graphs/Puppet_Base"));
+        if (replacementRendererBody.material != null)
+        {
+            mat.SetTexture("_Puppet_Colors", replacementRendererBody.material.GetTexture("_Puppet_Colors"));
+            mat.SetTexture("_Normal", replacementRendererBody.material.GetTexture("_Normal"));
+        }
+        replacementRendererBody.material = mat;
+        replacementRendererHead.material = mat;
+    }
+
+    public void LoadModelByPlayerName()
+    {
+        string playerName = this.transform.Find("PlayerCanvas").GetComponent<PlayerCanvas>().NetworkplayerName;
+
+        switch (playerName)
+        {
+            case "Toasted":
+            case "ToastedShoes":
+                LoadModel("Assets/_Modding/ToastedShoes.prefab");
+                break;
+            case "Homer":
+            case "Homer Simpson":
+                LoadModel("Assets/_Modding/Homer.prefab");
+                break;
+            case "Rick":
+            case "Rick Sanchez":
+                LoadModel("Assets/_Modding/Rick.prefab");
+                break;
+            case "Goofy":
+                LoadModel("Assets/_Modding/Goofy.prefab");
+                break;
+            case "name":
+                Debug.Log($"CharacterReplacer executed too early and got an invalid player name, this is currently unrecoverable.");
                 Destroy(this);
-            }
+                break;
+            default:
+                Debug.Log($"No replacement model found for player with name {playerName}");
+                Destroy(this);
+                break;
+        }
+    }
+
+    public void Awake()
+    {
+        if (Plugin.ModBundle == null)
+        {
+            Destroy(this);
         }
 
-        public Transform GetBoneTransformFromRenderer(SkinnedMeshRenderer renderer, string boneName)
+        switch (this.gameObject.name)
         {
-            IEnumerable<Transform> bones = renderer.bones.OfType<Transform>().Where(x => x.name == boneName);
-
-            return bones.Any() ? bones.First() : null;
+            case "Sock (1)": // Customization Menu
+                characterRenderer = this.transform.Find("Puppet_deform/Objects/Base").GetChild(0).GetComponent<SkinnedMeshRenderer>();
+                if (!characterRenderer) Destroy(this);
+                rendererRootTransforms.Add(this.transform.Find("Puppet_deform/Objects"));
+                rendererRootTransforms.Add(this.transform.Find("Puppet_deform/DEF_Spine/DEF_Spine.001/DEF_Spine.002/DEF_Spine.003/DEF_Spine.004/DEF_Head"));
+                LoadModel("Assets/_Modding/ToastedShoes.prefab");
+                break;
+            case "Player_final(Clone)": // In-Game
+                characterRenderer = this.transform.Find("models/Sock/Puppet_deform/Objects/Base").GetChild(0).GetComponent<SkinnedMeshRenderer>();
+                if (!characterRenderer) Destroy(this);
+                rendererRootTransforms.Add(this.transform.Find("models/Sock/Puppet_deform/Objects"));
+                rendererRootTransforms.Add(this.transform.Find("models/Sock/Puppet_deform/DEF_Spine/DEF_Spine.001/DEF_Spine.002/DEF_Spine.003/DEF_Spine.004/DEF_Head"));
+                LoadModelByPlayerName();
+                break;
+            case "Accused_Rig (1)":
+                characterRenderer = this.transform.Find("Accused_Rig").GetComponent<SkinnedMeshRenderer>();
+                if (!characterRenderer) Destroy(this);
+                rendererRootTransforms.Add(this.transform);
+                LoadModelWithoutSeparateHead("Assets/_Modding/Luigi.prefab");
+                break;
+            default:
+                Debug.Log($"No match found for {this.gameObject.name}!");
+                Destroy(this);
+                break;
         }
+    }
 
-        public void CopyPose()
+    public Transform GetBoneTransformFromRenderer(SkinnedMeshRenderer renderer, string boneName)
+    {
+        IEnumerable<Transform> bones = renderer.bones.OfType<Transform>().Where(x => x.name == boneName);
+
+        return bones.Any() ? bones.First() : null;
+    }
+
+    public void CopyPose()
+    {
+        targetRoot = GetBoneTransformFromRenderer(replacementRendererBody, rootName);
+        sourceRoot = GetBoneTransformFromRenderer(characterRenderer, rootName);
+        if (sourceRoot == null || targetRoot == null) { Debug.Log("Failed to find root bone for either the source or target!"); return; }
+        targetRoot.position = sourceRoot.position + rootOffset;
+
+        foreach (Transform targetBone in replacementRendererBody.bones)
         {
-            targetRoot = GetBoneTransformFromRenderer(replacementRenderer, hipsBoneName);
-            sourceRoot = GetBoneTransformFromRenderer(characterRenderer, hipsBoneName);
-            if (sourceRoot == null || targetRoot == null) { Debug.Log("Failed to find root bone for either the source or target!"); return; }
-            targetRoot.position = sourceRoot.position + hipsOffset;
-
-            foreach (Transform targetBone in replacementRenderer.bones)
+            Transform sourceBone = GetBoneTransformFromRenderer(characterRenderer, targetBone.name);
+            if (sourceBone == null)
             {
-                Transform sourceBone = GetBoneTransformFromRenderer(characterRenderer, targetBone.name);
-                if (sourceBone == null) continue; // Debug.Log($"Could not find {targetBone.name} on {characterRenderer}!");
-
-                targetBone.rotation = sourceBone.rotation;
+                Debug.Log($"Could not find bone {targetBone.name} on source model");
+                continue;
             }
 
-            return;
+            targetBone.rotation = sourceBone.rotation;
         }
 
-        public void LateUpdate()
-        {
-            if (characterRenderer != null && replacementRenderer != null)
-            {
-                replacementModel.SetActive(gameObject.activeInHierarchy);
-                CopyPose();
-            }
-        }
-        void OnEnable()
-        {
-            if (replacementModel != null)
-            {
-                replacementModel.SetActive(true);
-            }
-        }
+        return;
+    }
 
-        void OnDisable()
+    public void LateUpdate()
+    {
+        if (characterRenderer != null && replacementRendererBody != null)
         {
-            if (replacementModel != null)
-            {
-                replacementModel.SetActive(false);
-            }
+            replacementModel.SetActive(gameObject.activeInHierarchy);
+            CopyPose();
         }
+    }
 
-        public void OnDestroy()
+    void OnEnable()
+    {
+        if (replacementModel != null)
         {
-            CancelInvoke();
-            Destroy(replacementModel);
+            replacementModel.SetActive(true);
         }
+    }
+
+    void OnDisable()
+    {
+        if (replacementModel != null)
+        {
+            replacementModel.SetActive(false);
+        }
+    }
+
+    public void OnDestroy()
+    {
+        Debug.Log($"CharacterRenderer attached to {this.gameObject.name} was destroyed!");
+        CancelInvoke();
+        Destroy(replacementModel);
     }
 }
