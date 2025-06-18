@@ -130,6 +130,22 @@ public class CharacterReplacer : MonoBehaviour
                 LoadModel("Assets/_Modding/ToastedShoes.prefab");
                 break;
             case "Player_final(Clone)": // In-Game
+            case "Player_final [connId=0]": // I'm too lazy to overhaul this switch case solution so engage wall of fuck
+            case "Player_final [connId=1]":
+            case "Player_final [connId=2]":
+            case "Player_final [connId=3]":
+            case "Player_final [connId=4]":
+            case "Player_final [connId=5]":
+            case "Player_final [connId=6]":
+            case "Player_final [connId=7]":
+            case "Player_final [connId=8]":
+            case "Player_final [connId=9]":
+            case "Player_final [connId=10]":
+            case "Player_final [connId=11]":
+            case "Player_final [connId=12]":
+            case "Player_final [connId=13]":
+            case "Player_final [connId=14]":
+            case "Player_final [connId=15]":
                 characterRenderer = this.transform.Find("models/Sock/Puppet_deform/Objects/Base").GetChild(0).GetComponent<SkinnedMeshRenderer>();
                 if (!characterRenderer) Destroy(this);
                 rendererRootTransforms.Add(this.transform.Find("models/Sock/Puppet_deform/Objects"));
