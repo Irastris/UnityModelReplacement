@@ -1,61 +1,42 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>UnityModelReplacement</AssemblyName>
-    <Description>Replacing models in Content Warning</Description>
+    <Product>UnityModelReplacement</Product>
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
-    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <GamePath>F:\Steam Library\steamapps\common\Content Warning\</GamePath>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <RestoreSources>$(RestoreSources);https://api.nuget.org/v3/index.json;https://nuget.bepinex.dev/v3/index.json</RestoreSources>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <ReferencePath>$(ReferencePath);$(GamePath)\Content Warning_Data\Managed</ReferencePath>
-    <ReferencePath>$(ReferencePath);$(GamePath)\Content Warning_Data\Plugins</ReferencePath>
-    <ReferencePath>$(ReferencePath);$(GamePath)\BepinEx\plugins</ReferencePath>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.samboy.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
     <RootNamespace>UnityModelReplacement</RootNamespace>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <None Remove="mods.bundle" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <EmbeddedResource Include="mods.bundle" />
+    <EmbeddedResource Include="..\..\..\..\Unity Projects\PEAK\Assets\AssetBundles\mods.bundle" Link="mods.bundle" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
-    <PackageReference Include="BepInEx.Core" Version="5.*" IncludeAssets="compile" />
-    <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" IncludeAssets="compile" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" IncludeAssets="compile" />
-    <PackageReference Include="UnityEngine.Modules" Version="2022.3.9" IncludeAssets="compile" />
-    <PackageReference Include="HarmonyX" Version="2.10.2" IncludeAssets="compile" />
+    <PackageReference Include="BepInEx.Unity.Mono" Version="6.0.0-be.*" IncludeAssets="compile" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+	<PackageReference Include="UnityEngine.Modules" Version="6000.0.43" IncludeAssets="compile" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <Reference Include="Assembly-CSharp" Publicize="true">
-      <HintPath>$(GamePath)\Content Warning_Data\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Runtime" Publicize="true">
-      <HintPath>$(GamePath)\Content Warning_Data\Managed\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
-      <Private>false</Private>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\Steam Library\steamapps\common\PEAK\PEAK_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
-  
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(GamePath)BepInEx\plugins\$(ProjectName).dll&quot; &#xD;&#xA;" />
+    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;F:\Steam Library\steamapps\common\PEAK\BepInEx\plugins\$(ProjectName).dll&quot;" />
   </Target>
 </Project>
