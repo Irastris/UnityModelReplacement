@@ -1,84 +1,104 @@
-﻿using System;
+﻿using BepInEx.Logging;
+using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace UnityModelReplacement;
 
 public class CharacterReplacer : MonoBehaviour
 {
+    public PlayerMovement player;
     public GameObject replacementModel;
     public SkinnedMeshRenderer characterRenderer;
     public SkinnedMeshRenderer replacementRenderer;
     public Transform targetRoot;
     public Transform sourceRoot;
-    public string rootName = "Hip";
+    public string rootName = "spine";
+
+    public ManualLogSource MageLogger = UnityModelReplacement.MageLogger;
 
     public void LoadModel(string assetPath)
     {
-        replacementModel = Instantiate(Plugin.ModBundle.LoadAsset<GameObject>(assetPath));
-        replacementModel.transform.localScale = Vector3.one * 1.2121f; // Bandaid for me fucking up when preparing my Blender project
+        replacementModel = Instantiate(UnityModelReplacement.ModBundle.LoadAsset<GameObject>(assetPath));
         replacementRenderer = replacementModel.transform.Find("Model").GetComponent<SkinnedMeshRenderer>();
         replacementRenderer.updateWhenOffscreen = true;
 
-        foreach (Renderer renderer in this.gameObject.GetComponentsInChildren<Renderer>(true))
+        foreach (SkinnedMeshRenderer skinnedMeshRenderer in this.transform.Find("wizardtrio").GetComponentsInChildren<SkinnedMeshRenderer>(true))
         {
-            renderer.forceRenderingOff = true;
+            skinnedMeshRenderer.sharedMesh = null;
         }
 
-        foreach (Material material in replacementRenderer.materials)
+        this.transform.Find("armz/wizardarms/Plane.001").GetComponent<SkinnedMeshRenderer>().sharedMesh = null;
+
+        if (player.IsOwner) Destroy(this); // No replacement character if first person
+    }
+
+    public void AssignModel()
+    {
+        switch (player.playername.ToLower())
         {
-            material.shader = Shader.Find("W/Character");
-            material.DisableKeyword("_USESKINTONE_ON");
-            if (this.gameObject.GetComponent<Character>().IsLocal)
+            case "dobby":
+                LoadModel("Assets/_Modding/Dobby.prefab");
+                break;
+            case "gandalf":
+            case "gandalf the grey":
+                LoadModel("Assets/_Modding/Gandalf.prefab");
+                break;
+            case "hagrid":
+            case "rubeus hagrid":
+                LoadModel("Assets/_Modding/Hagrid.prefab");
+                break;
+            case "harry":
+            case "harry potter":
+                LoadModel("Assets/_Modding/Harry.prefab");
+                break;
+            case "ice king":
+            case "simon":
+            case "simon petrikov":
+                LoadModel("Assets/_Modding/IceKing.prefab");
+                break;
+            case "mickey":
+            case "mickey mouse":
+                LoadModel("Assets/_Modding/Mickey.prefab");
+                break;
+            case "ron":
+            case "ronald":
+            case "ron weasley":
+            case "ronald weasley":
+                LoadModel("Assets/_Modding/Ron.prefab");
+                break;
+            default:
+                MageLogger.LogInfo($"No match found for player {player.playername}!");
+                Destroy(this);
+                break;
+        }
+    }
+
+    public IEnumerator CheckPlayerNameHasSet()
+    {
+        bool valid = false;
+        while (!valid)
+        {
+            yield return new WaitForSeconds(1.0f);
+            if (player.playername != null && player.playername != "") // I'm stupid and don't know which an uninitialized string is, so let's check both
             {
-                material.SetFloat("_VertexGhost", 1f);
+                valid = true;
             }
         }
+        AssignModel();
     }
 
     public void Awake()
     {
-        characterRenderer = this.transform.Find("Scout/MainMesh").GetComponent<SkinnedMeshRenderer>();
+        player = this.transform.GetComponent<PlayerMovement>();
+        characterRenderer = player.wizardBody[player.playerTeam];
 
-        if (Plugin.ModBundle == null || !characterRenderer)
+        if (UnityModelReplacement.ModBundle == null || player == null || characterRenderer == null)
         {
             Destroy(this);
         }
 
-        switch (this.gameObject.GetComponent<Character>().characterName.ToLower())
-        {
-            case "spongebob":
-            case "spongebob squarepants":
-                LoadModel("Assets/_Modding/SpongeBob.prefab");
-                break;
-            case "patrick":
-            case "patrick star":
-                LoadModel("Assets/_Modding/Patrick.prefab");
-                break;
-            case "eugene":
-            case "eugene krabs":
-            case "krabs":
-            case "mr. krabs":
-                LoadModel("Assets/_Modding/MrKrabs.prefab");
-                break;
-            case "squidward":
-            case "squidward tentacles":
-                LoadModel("Assets/_Modding/Squidward.prefab");
-                break;
-            case "plankton":
-                LoadModel("Assets/_Modding/Plankton.prefab");
-                break;
-            case "sandy":
-            case "sandy cheeks":
-                LoadModel("Assets/_Modding/Sandy.prefab");
-                break;
-            default:
-                Destroy(this);
-                break;
-        }
+        StartCoroutine(CheckPlayerNameHasSet());
     }
 
     public Transform GetBoneTransformFromRenderer(SkinnedMeshRenderer renderer, string boneName)
@@ -115,7 +135,7 @@ public class CharacterReplacer : MonoBehaviour
 
     public void OnDestroy()
     {
-        Debug.Log($"CharacterRenderer attached to {this.gameObject.name} was destroyed!");
+        MageLogger.LogInfo($"CharacterRenderer attached to {this.gameObject.name} was destroyed!");
         CancelInvoke();
         Destroy(replacementModel);
     }

@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\..\..\..\Unity Projects\PEAK\Assets\AssetBundles\mods.bundle" Link="mods.bundle" />
+    <EmbeddedResource Include="..\..\..\..\Unity Projects\Mage Arena\Assets\AssetBundles\mods.bundle" Link="mods.bundle" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,11 +32,23 @@
 
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\Steam Library\steamapps\common\PEAK\PEAK_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\Steam Library\steamapps\common\Mage Arena\MageArena_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
+	<Reference Include="FishNet.Runtime">
+		<HintPath>..\..\..\..\Steam Library\steamapps\common\Mage Arena\MageArena_Data\Managed\FishNet.Runtime.dll</HintPath>
+	</Reference>
+	<Reference Include="Recognissimo">
+		<HintPath>..\..\..\..\Steam Library\steamapps\common\Mage Arena\MageArena_Data\Managed\Recognissimo.dll</HintPath>
+	</Reference>
+	<Reference Include="Unity.RenderPipelines.Core.Runtime">
+		<HintPath>..\..\..\..\Steam Library\steamapps\common\Mage Arena\MageArena_Data\Managed\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+	</Reference>
+	<Reference Include="Unity.RenderPipelines.HighDefinition.Runtime">
+		<HintPath>..\..\..\..\Steam Library\steamapps\common\Mage Arena\MageArena_Data\Managed\Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
+	</Reference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;F:\Steam Library\steamapps\common\PEAK\BepInEx\plugins\$(ProjectName).dll&quot;" />
+    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;F:\Steam Library\steamapps\common\Mage Arena\BepInEx\plugins\$(ProjectName).dll&quot;" />
   </Target>
 </Project>

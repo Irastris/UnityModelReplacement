@@ -2,20 +2,20 @@
 using BepInEx.Logging;
 using BepInEx.Unity.Mono;
 using HarmonyLib;
-using System;
+using Recognissimo.Components;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Video;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace UnityModelReplacement;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-[BepInProcess("PEAK.exe")]
-public class Plugin : BaseUnityPlugin
+[BepInProcess("MageArena.exe")]
+public class UnityModelReplacement : BaseUnityPlugin
 {
-    public static Plugin Instance = null;
+    public static UnityModelReplacement Instance = null;
+    public static ManualLogSource MageLogger = null;
     public static AssetBundle ModBundle = null;
 
     public void LoadAssetBundle()
@@ -34,6 +34,7 @@ public class Plugin : BaseUnityPlugin
     public void Awake()
     {
         if (Instance == null) Instance = this;
+        if (MageLogger == null) MageLogger = Logger;
 
         LoadAssetBundle();
 
@@ -41,12 +42,11 @@ public class Plugin : BaseUnityPlugin
         harmony.PatchAll();
     }
     
-    [HarmonyPatch(typeof(Character), "Awake")]
-    public class Patch_Character_Awake
+    [HarmonyPatch(typeof(PlayerMovement), "OnStartClient")]
+    public class Patch_PlayerMovement_OnStartClient
     {
         public static void Postfix(ref MonoBehaviour __instance)
         {
-            Debug.Log("Postfix is firing on method Awake from class Character!");
             if (!__instance.gameObject.TryGetComponent(out CharacterReplacer existingCharacterReplacer))
             {
                 __instance.gameObject.AddComponent<CharacterReplacer>();
@@ -54,30 +54,90 @@ public class Plugin : BaseUnityPlugin
         }
     }
 
-    [HarmonyPatch(typeof(BingBong), "Start")]
-    public class Patch_BingBong_Start
+    [HarmonyPatch(typeof(MainMenuManager), "ActuallyStartGameActually")]
+    public class Patch_MainMenuManager_ActuallyStartGameActually
     {
-        public static void Postfix(ref MonoBehaviour __instance)
+        public static void Postfix(ref MainMenuManager __instance)
         {
-            if (ModBundle != null)
+            Bloom bloom;
+            if (__instance.volume.profile.TryGet<Bloom>(out bloom))
             {
-                Mesh garyMesh = ModBundle.LoadAsset<Mesh>("Assets/_Modding/Gary.mesh");
-                Texture2D garyTex = ModBundle.LoadAsset<Texture2D>("Assets/_Modding/Gary.png");
+                bloom.active = false;
+            }
+        }
+    }
 
-                foreach (MeshRenderer renderer in __instance.transform.GetComponentsInChildren<MeshRenderer>(true))
+    public static string[] CustomWords_HP = ["incendiary", "portal", "aperture", "destination", "destiny", "exit", "exodus", "hex"];
+    public static string[] CustomWords_Meme = ["five", "big", "boom", "ice", "meet", "jeffrey", "epstein", "nothing", "jet", "holiday"];
+
+    [HarmonyPatch(typeof(VoiceControlListener), "OnStartClient")]
+    public class Patch_VoiceControlListener_OnStartClient
+    {
+        public static void Postfix(ref VoiceControlListener __instance)
+        {
+            SpeechRecognizer sr = __instance.GetComponent<SpeechRecognizer>();
+            foreach (string word in CustomWords_HP)
+            {
+                sr.Vocabulary.Add(word);
+            }
+            foreach (string word in CustomWords_Meme)
+            {
+                sr.Vocabulary.Add(word);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(VoiceControlListener), "resetmic")]
+    public class Patch_VoiceControlListener_resetmic
+    {
+        public static void Postfix(ref VoiceControlListener __instance)
+        {
+            SpeechRecognizer sr = __instance.GetComponent<SpeechRecognizer>();
+            foreach (string word in CustomWords_HP)
+            {
+                sr.Vocabulary.Add(word);
+            }
+            foreach (string word in CustomWords_Meme)
+            {
+                sr.Vocabulary.Add(word);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(VoiceControlListener), "tryresult")]
+    public class Patch_VoiceControlListener_tryresult
+    {
+        public static bool Prefix(ref VoiceControlListener __instance, ref string res)
+        {
+            if (res != null)
+            {
+                if (res.Contains("incendiary") || res.Contains("five") || res.Contains("big") || res.Contains("boom"))
                 {
-                    if (renderer.transform.name == "Cube")
-                    {
-                        MeshFilter meshFilter = renderer.transform.GetComponent<MeshFilter>();
-                        meshFilter.sharedMesh = garyMesh;
-                        renderer.material.SetTexture("_BaseTexture", garyTex);
-                    }
-                    else
-                    {
-                        renderer.forceRenderingOff = true;
-                    }
+                    __instance.CastFireball();
+                }
+                else if (res.Contains("ice") || res.Contains("meet"))
+                {
+                    __instance.CastFrostBolt();
+                }
+                else if (res.Contains("portal") || res.Contains("aperture") || res.Contains("jeffrey"))
+                {
+                    __instance.CastWorm();
+                }
+                else if (res.Contains("destination") || res.Contains("destiny") || res.Contains("exit") || res.Contains("exodus") || res.Contains("epstein"))
+                {
+                    __instance.CastHole();
+                }
+                else if (res.Contains("hex") || res.Contains("nothing") || res.Contains("jet") || res.Contains("holiday"))
+                {
+                    __instance.CastMagicMissle();
+                }
+                else
+                {
+                    MageLogger.LogInfo($"Result contained no known custom words: {res}");
                 }
             }
+
+            return true;
         }
     }
 }
