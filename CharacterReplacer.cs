@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace UnityModelReplacement;
@@ -18,7 +14,7 @@ public class CharacterReplacer : MonoBehaviour
 
     public void LoadModel(string assetPath)
     {
-        replacementModel = Instantiate(Plugin.ModBundle.LoadAsset<GameObject>(assetPath));
+        replacementModel = Instantiate(UnityModelReplacement.ModBundle.LoadAsset<GameObject>(assetPath));
         replacementModel.transform.localScale = Vector3.one * 1.2121f; // Bandaid for me fucking up when preparing my Blender project
         replacementRenderer = replacementModel.transform.Find("Model").GetComponent<SkinnedMeshRenderer>();
         replacementRenderer.updateWhenOffscreen = true;
@@ -43,37 +39,28 @@ public class CharacterReplacer : MonoBehaviour
     {
         characterRenderer = this.transform.Find("Scout/MainMesh").GetComponent<SkinnedMeshRenderer>();
 
-        if (Plugin.ModBundle == null || !characterRenderer)
+        if (UnityModelReplacement.ModBundle == null || !characterRenderer)
         {
             Destroy(this);
         }
 
         switch (this.gameObject.GetComponent<Character>().characterName.ToLower())
         {
-            case "spongebob":
-            case "spongebob squarepants":
-                LoadModel("Assets/_Modding/SpongeBob.prefab");
+            case "goofy":
+                LoadModel("Assets/_Modding/Goofy.prefab");
                 break;
-            case "patrick":
-            case "patrick star":
-                LoadModel("Assets/_Modding/Patrick.prefab");
+            case "homer":
+            case "homer simpson":
+                LoadModel("Assets/_Modding/HomerSimpson.prefab");
                 break;
-            case "eugene":
-            case "eugene krabs":
-            case "krabs":
-            case "mr. krabs":
-                LoadModel("Assets/_Modding/MrKrabs.prefab");
+            case "peter":
+            case "peter griffin":
+                LoadModel("Assets/_Modding/PeterGriffin.prefab");
                 break;
-            case "squidward":
-            case "squidward tentacles":
-                LoadModel("Assets/_Modding/Squidward.prefab");
-                break;
-            case "plankton":
-                LoadModel("Assets/_Modding/Plankton.prefab");
-                break;
-            case "sandy":
-            case "sandy cheeks":
-                LoadModel("Assets/_Modding/Sandy.prefab");
+            case "toasted":
+            case "toastedshoes":
+            case "toasted shoes":
+                LoadModel("Assets/_Modding/ToastedShoes.prefab");
                 break;
             default:
                 Destroy(this);

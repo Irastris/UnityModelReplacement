@@ -1,23 +1,19 @@
 ﻿using BepInEx;
-using BepInEx.Logging;
 using BepInEx.Unity.Mono;
 using HarmonyLib;
-using System;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Video;
 
 namespace UnityModelReplacement;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 [BepInProcess("PEAK.exe")]
-public class Plugin : BaseUnityPlugin
+public class UnityModelReplacement : BaseUnityPlugin
 {
-    public static Plugin Instance = null;
+    public static UnityModelReplacement Instance = null;
     public static AssetBundle ModBundle = null;
-
+        
     public void LoadAssetBundle()
     {
         MemoryStream memoryStream;
@@ -40,13 +36,12 @@ public class Plugin : BaseUnityPlugin
         Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
         harmony.PatchAll();
     }
-    
+
     [HarmonyPatch(typeof(Character), "Awake")]
     public class Patch_Character_Awake
     {
         public static void Postfix(ref MonoBehaviour __instance)
         {
-            Debug.Log("Postfix is firing on method Awake from class Character!");
             if (!__instance.gameObject.TryGetComponent(out CharacterReplacer existingCharacterReplacer))
             {
                 __instance.gameObject.AddComponent<CharacterReplacer>();
@@ -59,24 +54,9 @@ public class Plugin : BaseUnityPlugin
     {
         public static void Postfix(ref MonoBehaviour __instance)
         {
-            if (ModBundle != null)
+            if (!__instance.gameObject.TryGetComponent(out BingBongReplacer existingBingBongReplacer))
             {
-                Mesh garyMesh = ModBundle.LoadAsset<Mesh>("Assets/_Modding/Gary.mesh");
-                Texture2D garyTex = ModBundle.LoadAsset<Texture2D>("Assets/_Modding/Gary.png");
-
-                foreach (MeshRenderer renderer in __instance.transform.GetComponentsInChildren<MeshRenderer>(true))
-                {
-                    if (renderer.transform.name == "Cube")
-                    {
-                        MeshFilter meshFilter = renderer.transform.GetComponent<MeshFilter>();
-                        meshFilter.sharedMesh = garyMesh;
-                        renderer.material.SetTexture("_BaseTexture", garyTex);
-                    }
-                    else
-                    {
-                        renderer.forceRenderingOff = true;
-                    }
-                }
+                __instance.gameObject.AddComponent<BingBongReplacer>();
             }
         }
     }
