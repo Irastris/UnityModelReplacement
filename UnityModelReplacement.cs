@@ -49,6 +49,7 @@ public class UnityModelReplacement : BaseUnityPlugin
         }
     }
 
+    /*
     [HarmonyPatch(typeof(BingBong), "Start")]
     public class Patch_BingBong_Start
     {
@@ -60,4 +61,5 @@ public class UnityModelReplacement : BaseUnityPlugin
             }
         }
     }
+    */
 }

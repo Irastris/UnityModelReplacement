@@ -46,21 +46,21 @@ public class CharacterReplacer : MonoBehaviour
 
         switch (this.gameObject.GetComponent<Character>().characterName.ToLower())
         {
-            case "goofy":
-                LoadModel("Assets/_Modding/Goofy.prefab");
-                break;
             case "homer":
             case "homer simpson":
                 LoadModel("Assets/_Modding/HomerSimpson.prefab");
                 break;
-            case "peter":
-            case "peter griffin":
-                LoadModel("Assets/_Modding/PeterGriffin.prefab");
+            case "marge":
+            case "marge simpson":
+                LoadModel("Assets/_Modding/MargeSimpson.prefab");
                 break;
-            case "toasted":
-            case "toastedshoes":
-            case "toasted shoes":
-                LoadModel("Assets/_Modding/ToastedShoes.prefab");
+            case "bart":
+            case "bart simpson":
+                LoadModel("Assets/_Modding/BartSimpson.prefab");
+                break;
+            case "ned":
+            case "ned flanders":
+                LoadModel("Assets/_Modding/NedFlanders.prefab");
                 break;
             default:
                 Destroy(this);
