@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Unity.Mono;
 using HarmonyLib;
+using Mimic.Actors;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
@@ -8,7 +9,7 @@ using UnityEngine;
 namespace UnityModelReplacement;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
-[BepInProcess("PEAK.exe")]
+[BepInProcess("MIMESIS.exe")]
 public class UnityModelReplacement : BaseUnityPlugin
 {
     public static UnityModelReplacement Instance = null;
@@ -37,8 +38,8 @@ public class UnityModelReplacement : BaseUnityPlugin
         harmony.PatchAll();
     }
 
-    [HarmonyPatch(typeof(Character), "Awake")]
-    public class Patch_Character_Awake
+    [HarmonyPatch(typeof(ProtoActor), "SetAsOtherPlayer")]
+    public class Patch_ProtoActor_SetAsOtherPlayer
     {
         public static void Postfix(ref MonoBehaviour __instance)
         {
@@ -49,17 +50,15 @@ public class UnityModelReplacement : BaseUnityPlugin
         }
     }
 
-    /*
-    [HarmonyPatch(typeof(BingBong), "Start")]
-    public class Patch_BingBong_Start
+    [HarmonyPatch(typeof(ProtoActor), "SetAsMonster")]
+    public class Patch_ProtoActor_SetAsMonster
     {
         public static void Postfix(ref MonoBehaviour __instance)
         {
-            if (!__instance.gameObject.TryGetComponent(out BingBongReplacer existingBingBongReplacer))
+            if (!__instance.gameObject.TryGetComponent(out MimicReplacer existingMimicReplacer))
             {
-                __instance.gameObject.AddComponent<BingBongReplacer>();
+                __instance.gameObject.AddComponent<MimicReplacer>();
             }
         }
     }
-    */
 }

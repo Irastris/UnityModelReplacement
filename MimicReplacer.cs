@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Mimic.Actors;
+using System;
 using UnityEngine;
 
 namespace UnityModelReplacement;
 
-public class CharacterReplacer : MonoBehaviour
+public class MimicReplacer : MonoBehaviour
 {
     public GameObject replacementModel;
-    public SkinnedMeshRenderer characterRenderer;
+    public SkinnedMeshRenderer mimicRenderer;
     public SkinnedMeshRenderer replacementRenderer;
     public Transform targetRoot;
     public Transform sourceRoot;
@@ -18,7 +19,7 @@ public class CharacterReplacer : MonoBehaviour
         replacementRenderer = replacementModel.transform.Find("Model").GetComponent<SkinnedMeshRenderer>();
         replacementRenderer.updateWhenOffscreen = true;
 
-        characterRenderer.forceRenderingOff = true;
+        mimicRenderer.forceRenderingOff = true;
 
         foreach (Material material in replacementRenderer.materials)
         {
@@ -28,7 +29,12 @@ public class CharacterReplacer : MonoBehaviour
 
     public void Awake()
     {
-        this.transform.Find("prefab_PlayerPuppet(Clone)/PlayerCharacter/Body").TryGetComponent<SkinnedMeshRenderer>(out characterRenderer);
+        if (!this.transform.GetComponent<ProtoActor>().nickName.StartsWith("mimic"))
+        {
+            Destroy(this);
+        }
+
+        this.transform.Find("prefab_MimicPuppet(Clone)/PlayerCharacter/Body").TryGetComponent<SkinnedMeshRenderer>(out mimicRenderer);
 
         // LoadModel("Assets/_Modding/HomerSimpson.prefab");
         LoadModel("Assets/_Modding/Kermit.prefab");
@@ -45,19 +51,19 @@ public class CharacterReplacer : MonoBehaviour
 
     public void CopyPose()
     {
-        if (characterRenderer == null)
+        if (mimicRenderer == null)
         {
-            this.transform.Find("prefab_PlayerPuppet(Clone)/PlayerCharacter/Body").TryGetComponent<SkinnedMeshRenderer>(out characterRenderer);
+            this.transform.Find("prefab_MimicPuppet(Clone)/PlayerCharacter/Body").TryGetComponent<SkinnedMeshRenderer>(out mimicRenderer);
             return;
         }
 
         targetRoot = GetBoneTransformFromRenderer(replacementRenderer, rootName);
-        sourceRoot = GetBoneTransformFromRenderer(characterRenderer, rootName);
+        sourceRoot = GetBoneTransformFromRenderer(mimicRenderer, rootName);
         targetRoot.position = sourceRoot.position;
 
         foreach (Transform targetBone in replacementRenderer.bones)
         {
-            Transform sourceBone = GetBoneTransformFromRenderer(characterRenderer, targetBone.name);
+            Transform sourceBone = GetBoneTransformFromRenderer(mimicRenderer, targetBone.name);
             if (sourceBone == null)
             {
                 Debug.Log($"Failed to find matching bone on source renderer for {targetBone.name}");
@@ -76,7 +82,7 @@ public class CharacterReplacer : MonoBehaviour
 
     public void OnDestroy()
     {
-        Debug.Log($"CharacterRenderer attached to {this.transform.name} was destroyed!");
+        Debug.Log($"MimicRenderer attached to {this.transform.name} was destroyed!");
         CancelInvoke();
         Destroy(replacementModel);
     }
